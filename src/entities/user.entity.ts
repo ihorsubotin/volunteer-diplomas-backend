@@ -6,6 +6,12 @@ export class User {
   id: number;
 
   @Column()
+  email: string;
+
+  @Column()
+  passwordHash: string;
+
+  @Column()
   firstName: string;
 
   @Column()
@@ -13,5 +19,8 @@ export class User {
 
   @Column({ default: false })
   isAdmin: boolean;
+
+  @Column({nullable: true})
+  region: string;
 
 }

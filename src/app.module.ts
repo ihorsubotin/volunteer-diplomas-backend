@@ -4,11 +4,11 @@ import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
+import { AuthModule } from './auth/auth.module';
 
 
 @Module({
   imports: [
-	UserModule,
 	ConfigModule.forRoot(),
 	TypeOrmModule.forRootAsync({
 		imports: [ConfigModule],
@@ -27,7 +27,8 @@ import { DataSource } from 'typeorm';
 		  const dataSource = await new DataSource(options).initialize();
 		  return dataSource;
 		},
-	})
+	}),
+	AuthModule
   ],
   providers: [AppService],
 })

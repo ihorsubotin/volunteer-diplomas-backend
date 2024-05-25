@@ -1,6 +1,11 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from 'src/entities/user.entity';
+import CreateUserDTO from './DTO/createUserDTO';
+import { LoggedIn } from 'src/auth/loggedIn.guard';
+import { Admin } from 'src/auth/admin.guard';
+
+
 
 @Controller('user')
 export class UserController {
@@ -9,9 +14,10 @@ export class UserController {
 		private userService: UserService
 	){}
 
+	@UseGuards(LoggedIn)
 	@Get('me')
-	getMe(){
-		return 'me';
+	getMe(@Req() req){
+		return req.user;
 	}
 
 	@Get()
@@ -19,13 +25,10 @@ export class UserController {
 		return this.userService.findAll();
 	}
 
+	@UseGuards(Admin)
 	@Post()
-	createUser(){
-		this.userService.createUser({
-			firstName: 'Ihor',
-			lastName: 'Subotin',
-			isAdmin: true,
-		});
+	createUser(@Body() userDTO: CreateUserDTO){
+		return this.userService.createUser(userDTO);
 	}
 
 }
