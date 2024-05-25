@@ -2,8 +2,8 @@ import { Body, Controller, Delete, ForbiddenException, Get, NotFoundException, P
 import { UserService } from './user.service';
 import { User } from 'src/entities/user.entity';
 import CreateUserDTO from './DTO/createUserDTO';
-import { LoggedIn } from 'src/auth/loggedIn.guard';
-import { Admin } from 'src/auth/admin.guard';
+import { LoggedIn } from 'src/auth/guards/loggedIn.guard';
+import { Admin } from 'src/auth/guards/admin.guard';
 import UpdateUserDTO from './DTO/updateUserDTO';
 
 
