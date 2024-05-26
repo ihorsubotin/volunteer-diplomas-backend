@@ -8,9 +8,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   app.enableCors({
-	origin: configService.get("ALLOW_ORIGIN"),
-	credentials: true,
-    exposedHeaders: ['set-cookie'],
+    origin: configService.get("ALLOW_ORIGIN"),
+    credentials: true,
+	exposedHeaders: ['set-cookie'],
   });
   app.use(session({
 	secret: 'keyboard cat',
