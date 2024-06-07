@@ -24,4 +24,4 @@ jobs:
           npm install --only=prod
           npm run build
           cp .env dist/.env
-          pm2 restart diplomas-backend
+          pm2 restart volunteer-backend
