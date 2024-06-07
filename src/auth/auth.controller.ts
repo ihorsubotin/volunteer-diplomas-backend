@@ -24,6 +24,7 @@ export class AuthController {
 			throw new UnauthorizedException();
 		}
 		req.session.user = user;
+		req.session.isTg = false;
 		return req.session.user;
 		//return this.authService.singIn(signInDto.email, signInDto.password);
 	}

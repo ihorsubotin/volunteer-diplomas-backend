@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
+import { TelegramController } from './telegram/telegram.controller';
+import { TelegramModule } from './telegram/telegram.module';
 
 
 @Module({
@@ -28,7 +30,8 @@ import { AuthModule } from './auth/auth.module';
 		  return dataSource;
 		},
 	}),
-	AuthModule
+	AuthModule,
+	TelegramModule
   ],
   providers: [AppService],
 })
