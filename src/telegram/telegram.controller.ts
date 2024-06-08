@@ -4,12 +4,15 @@ import { LoggedIn } from 'src/auth/guards/loggedIn.guard';
 import { TelegramService } from './telegram.service';
 import { UserService } from 'src/user/user.service';
 import { IsNotEmpty } from 'class-validator';
+import { IsTelegram } from 'src/auth/guards/telegram.guard';
 
 class loginDTO{
 	@IsNotEmpty()
 	token: string;
 	@IsNotEmpty()
 	userInfo: string;
+	@IsNotEmpty()
+	telegramUser: number;
 }
 
 @Controller('telegram')
@@ -34,6 +37,7 @@ export class TelegramController {
 		return this.telegramService.getUserConnections(req.user.id);
 	}
 
+	@UseGuards(IsTelegram)
 	@Post('login')
 	async loginViaToken(@Req() req, @Body() body: loginDTO){
 		const connection = await this.telegramService.validateConnection(body.token);
@@ -42,7 +46,6 @@ export class TelegramController {
 		}
 		const {passwordHash, ...user} = await this.userService.findOneById(connection.userID);
 		req.session.user = user;
-		req.session.isTg = true;
 		await this.telegramService.saveConnection(connection, body.userInfo, req.session.id);
 		return user;
 	}

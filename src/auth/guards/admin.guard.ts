@@ -1,6 +1,5 @@
 import { ExecutionContext, Injectable } from "@nestjs/common";
 import { LoggedIn } from "./loggedIn.guard";
-import { Observable } from "rxjs";
 
 @Injectable()
 export class Admin extends LoggedIn{

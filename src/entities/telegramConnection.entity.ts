@@ -15,8 +15,8 @@ export class TelegramConnection {
   validUntil: Date;
 
   @Column({nullable: true})
-  userInfo: string;
+  telegramUser: number;
 
   @Column({nullable: true})
-  sid: string;
+  userInfo: string;
 }

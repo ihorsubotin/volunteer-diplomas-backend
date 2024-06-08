@@ -26,11 +26,11 @@ export class TelegramService {
 		const connections = await this.connectionRepository.find({
 			where: {
 				userID: userID,
-				//validUntil: null,
+				validUntil: null,
 			}
 		});
 		const result = connections.map((connection)=>{
-			const {sid, validUntil, connectToken, ...result} = connection;
+			const {telegramUser, validUntil, connectToken, ...result} = connection;
 			return result;
 		})
 		return result;
@@ -53,10 +53,10 @@ export class TelegramService {
 		}
 		return connection;
 	}
-	async saveConnection(connection: TelegramConnection, userInfo: string, sid: string){
+	async saveConnection(connection: TelegramConnection, userInfo: string, telegramUser: number){
 		connection.validUntil = null;
 		connection.userInfo = userInfo;
-		connection.sid = sid;
+		connection.telegramUser = telegramUser;
 		this.connectionRepository.save(connection);
 	}
 }
