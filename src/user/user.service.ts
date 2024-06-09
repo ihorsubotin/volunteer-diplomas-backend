@@ -32,14 +32,35 @@ export class UserService {
 	}
 
 	async findOneByEmail(email: string): Promise<User | null>{
+		if(!email){
+			return null;
+		}
 		return this.userRepository.findOne({where: {
 			email: email
 		}});
 	}
 	async findOneById(id: number): Promise<User | null>{
+		if(!id){
+			return null;
+		}
 		return this.userRepository.findOne({where: {
 			id: id
 		}});
+	}
+
+	async getExtendedUserById(id: number){
+		if(!id){
+			return null;
+		}
+		let {passwordHash, ...user} = await this.userRepository.findOne({
+			where: {
+				id: id
+			},
+			relations: {
+				volunteer: true
+			}
+		});
+		return user;
 	}
 
 	async updateUser(id: number, update: UpdateUserDTO){

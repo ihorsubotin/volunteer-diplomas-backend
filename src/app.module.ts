@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { TelegramController } from './telegram/telegram.controller';
 import { TelegramModule } from './telegram/telegram.module';
 import { UpdateModule } from './update/update.module';
+import { VolunteerModule } from './volunteer/volunteer.module';
+import { EventModule } from './event/event.module';
 
 
 @Module({
@@ -33,7 +35,9 @@ import { UpdateModule } from './update/update.module';
 	}),
 	AuthModule,
 	TelegramModule,
-	UpdateModule
+	UpdateModule,
+	VolunteerModule,
+	EventModule
   ],
   providers: [AppService],
 })

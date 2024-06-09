@@ -7,40 +7,48 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class UpdateService {
-  constructor(
-    @InjectRepository(Update)
-    private updateRepository: Repository<Update>
-  ){}
+	constructor(
+		@InjectRepository(Update)
+		private updateRepository: Repository<Update>
+	) { }
 
-  create(createUpdateDto: CreateUpdateDto) {
-    return 'This action adds a new update';
-  }
+	create(createUpdateDto: CreateUpdateDto) {
+		return 'This action adds a new update';
+	}
 
-  findUnseen() {
-   	const unseen = this.updateRepository.find({
-      where:{
-        seen: false
-      },
-      relations: {
-        connection: true,
-      },
-      order: {
-        id: 'ASC',
-      },
-      take: 10
-    })
-    return unseen;
-  }
+	findUnseen() {
+		const unseen = this.updateRepository.find({
+			where: {
+				seen: false
+			},
+			relations: {
+				connection: true,
+			},
+			order: {
+				id: 'ASC',
+			},
+			take: 10
+		})
+		return unseen;
+	}
 
-  findOne(id: number) {
-    return `This action returns a #${id} update`;
-  }
+	confirmViews(ids: number[]){
+		if(!ids || ids.length == 0){
+			return false;
+		}
+		const update = this.updateRepository.update(ids, {seen: true});
+		return true;
+	}
 
-  update(id: number) {
-    return `This action updates a #${id} update`;
-  }
+	findOne(id: number) {
+		return `This action returns a #${id} update`;
+	}
 
-  remove(id: number) {
-    return `This action removes a #${id} update`;
-  }
+	update(id: number) {
+		return `This action updates a #${id} update`;
+	}
+
+	remove(id: number) {
+		return `This action removes a #${id} update`;
+	}
 }

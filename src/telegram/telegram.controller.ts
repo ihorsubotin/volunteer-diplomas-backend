@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { LoggedIn } from 'src/auth/guards/loggedIn.guard';
+import { IsLoggedIn } from 'src/auth/guards/loggedIn.guard';
 import { TelegramService } from './telegram.service';
 import { UserService } from 'src/user/user.service';
 import { IsNotEmpty } from 'class-validator';
@@ -23,7 +23,7 @@ export class TelegramController {
 		private userService: UserService,
 	){}
 
-	@UseGuards(LoggedIn)
+	@UseGuards(IsLoggedIn)
 	@Post('connection')
 	async generateNewConnection(@Req() req){
 		let connection = await this.telegramService.generateConnection(req.user.id);
@@ -31,7 +31,7 @@ export class TelegramController {
 		return {url};
 	}
 
-	@UseGuards(LoggedIn)
+	@UseGuards(IsLoggedIn)
 	@Delete('connection/:id')
 	async getConnection(@Param() params,  @Req() req){
 		if(!params || !params.id){
@@ -49,7 +49,7 @@ export class TelegramController {
 		throw new UnauthorizedException();
 	}
 
-	@UseGuards(LoggedIn)
+	@UseGuards(IsLoggedIn)
 	@Get('connections')
 	async getMyConnections(@Req() req){
 		return this.telegramService.getUserConnections(req.user.id);

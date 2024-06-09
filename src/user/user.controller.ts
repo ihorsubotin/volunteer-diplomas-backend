@@ -2,8 +2,8 @@ import { Body, Controller, Delete, ForbiddenException, Get, NotFoundException, P
 import { UserService } from './user.service';
 import { User } from 'src/entities/user.entity';
 import CreateUserDTO from './dto/createUserDTO';
-import { LoggedIn } from 'src/auth/guards/loggedIn.guard';
-import { Admin } from 'src/auth/guards/admin.guard';
+import { IsLoggedIn } from 'src/auth/guards/loggedIn.guard';
+import { IsAdmin } from 'src/auth/guards/admin.guard';
 import UpdateUserDTO from './dto/updateUserDTO';
 
 
@@ -20,17 +20,16 @@ export class UserController {
 		return this.userService.findAll();
 	}
 
-	@UseGuards(LoggedIn)
+	@UseGuards(IsLoggedIn)
 	@Get(':id')
-	async getMe(@Req() req, @Param() params: any){
+	async getUser(@Req() req, @Param() params: any){
 		if(params?.id == 'me'){
 			params.id = req.user.id;
 		}
 		if(req.user.isAdmin || (params.id && req.user.id == params.id)){
-			const user =  await this.userService.findOneById(params.id);
+			const user =  await this.userService.getExtendedUserById(params.id);
 			if(user){
-				const {passwordHash, ...result} = user;
-				return result;
+				return user;
 			}else{
 				throw new NotFoundException();
 			}
@@ -38,13 +37,13 @@ export class UserController {
 		throw new UnauthorizedException();		
 	}
 
-	@UseGuards(Admin)
+	@UseGuards(IsAdmin)
 	@Post()
 	createUser(@Body() userDTO: CreateUserDTO){
 		return this.userService.createUser(userDTO);
 	}
 
-	@UseGuards(LoggedIn)
+	@UseGuards(IsLoggedIn)
 	@Put('password/:id')
 	async changePassword(@Param() params: any, @Body() newPassword, @Req() req){
 		if(params?.id == 'me'){
@@ -64,7 +63,7 @@ export class UserController {
 		throw new UnauthorizedException();
 	}
 
-	@UseGuards(LoggedIn)
+	@UseGuards(IsLoggedIn)
 	@Put(':id')
 	async updateUser(@Param() params: any, @Body() userDTO: UpdateUserDTO, @Req() req){
 		if(params?.id == 'me'){
@@ -80,7 +79,7 @@ export class UserController {
 		throw new UnauthorizedException();
 	}
 
-	@UseGuards(Admin)
+	@UseGuards(IsAdmin)
 	@Delete(':id')
 	async deleteUser(@Param() params: any,  @Req() req){
 		if(params?.id == 'me'){

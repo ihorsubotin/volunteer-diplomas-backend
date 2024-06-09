@@ -15,12 +15,9 @@ export class AuthService {
 		let saltedPassword = user.id + password;
 		const match = await bcrypt.compare(saltedPassword, user.passwordHash);
 		if(match){
-			let {passwordHash, ...result} = user;
-			return result;
+			return await this.userService.getExtendedUserById(user.id);
 		}else{
 			return null;
 		}
 	}
-
-
 }

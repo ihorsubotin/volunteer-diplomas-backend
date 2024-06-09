@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Volunteer } from './volunteer.entity';
 
 @Entity()
 export class User {
@@ -23,4 +24,7 @@ export class User {
   @Column({nullable: true})
   region: string;
 
+  @OneToOne(type=>Volunteer, volunteer=>volunteer.user)
+  @JoinColumn()
+  volunteer: Volunteer;
 }
