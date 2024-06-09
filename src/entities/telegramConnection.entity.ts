@@ -1,12 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { User } from './user.entity';
 
 @Entity()
 export class TelegramConnection {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  userID: number;
+  @ManyToOne(() => User)
+  user: User;
 
   @Column()
   connectToken: string;

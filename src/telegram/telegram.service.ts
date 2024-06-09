@@ -3,19 +3,21 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TelegramConnection } from 'src/entities/telegramConnection.entity';
 import { User } from 'src/entities/user.entity';
-import { Repository } from 'typeorm';
+import { UserService } from 'src/user/user.service';
+import { Repository, IsNull} from 'typeorm';
 import * as uid from 'uid-safe';
 @Injectable()
 export class TelegramService {
 	
 	constructor(
 		@InjectRepository(TelegramConnection)
-		private connectionRepository: Repository<TelegramConnection>
+		private connectionRepository: Repository<TelegramConnection>,
+		private userService: UserService
 	){}
 
 	async generateConnection(userID: number): Promise<TelegramConnection>{
 		const connection = new TelegramConnection();
-		connection.userID =userID;
+		connection.user = await this.userService.findOneById(userID);
 		connection.connectToken = uid.sync(24);
 		connection.validUntil = new Date(Date.now() + 10*60*1000);
 		this.connectionRepository.save(connection);
@@ -23,10 +25,14 @@ export class TelegramService {
 	}
 
 	async getUserConnections(userID: number){
+		const user = await this.userService.findOneById(userID);
+		if(!user){
+			return [];
+		}
 		const connections = await this.connectionRepository.find({
 			where: {
-				userID: userID,
-				validUntil: null,
+				user: user,
+				validUntil: IsNull()
 			}
 		});
 		const result = connections.map((connection)=>{
@@ -36,10 +42,35 @@ export class TelegramService {
 		return result;
 	}
 
+	async getUserConnection(connectionID: number){
+		return await this.connectionRepository.findOne({
+			where:{
+				id: connectionID
+			},
+			relations: {
+				user: true
+			}
+		});
+	}
+
+	async deleteUserConnection(connectionID: number){
+		const connection = await this.connectionRepository.findOne({where:{
+			id: connectionID
+		}});
+		if(connection){
+			await this.connectionRepository.remove(connection);
+			return true;
+		}
+		return false;
+	}
+
 	async validateConnection(token: string){
 		const connection = await this.connectionRepository.findOne({
 			where: {
 				connectToken: token
+			},
+			relations: {
+				user: true,
 			}
 		});
 		if(!connection){

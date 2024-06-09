@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LoggedIn } from 'src/auth/guards/loggedIn.guard';
 import { TelegramService } from './telegram.service';
@@ -25,10 +25,28 @@ export class TelegramController {
 
 	@UseGuards(LoggedIn)
 	@Post('connection')
-	async getConnection(@Req() req){
+	async generateNewConnection(@Req() req){
 		let connection = await this.telegramService.generateConnection(req.user.id);
 		let url = this.config.get('TELEGRAM_START_URL') + connection.connectToken;
 		return {url};
+	}
+
+	@UseGuards(LoggedIn)
+	@Delete('connection/:id')
+	async getConnection(@Param() params,  @Req() req){
+		if(!params || !params.id){
+			throw new NotFoundException();
+		}
+		const connection = await this.telegramService.getUserConnection(params.id);
+		if(connection?.user.id === req.user.id){
+			const success = await this.telegramService.deleteUserConnection(params.id);
+			if(success){
+				return 'Deleted succesfully!';
+			}else{
+				throw new NotFoundException();
+			}
+		}
+		throw new UnauthorizedException();
 	}
 
 	@UseGuards(LoggedIn)
@@ -44,9 +62,8 @@ export class TelegramController {
 		if(!connection){
 			throw new UnauthorizedException();
 		}
-		const {passwordHash, ...user} = await this.userService.findOneById(connection.userID);
-		req.session.user = user;
-		await this.telegramService.saveConnection(connection, body.userInfo, req.session.id);
+		const {passwordHash, ...user} = connection.user;
+		await this.telegramService.saveConnection(connection, body.userInfo, body.telegramUser);
 		return user;
 	}
 }

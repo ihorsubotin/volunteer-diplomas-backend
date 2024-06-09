@@ -7,6 +7,7 @@ import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
 import { TelegramController } from './telegram/telegram.controller';
 import { TelegramModule } from './telegram/telegram.module';
+import { UpdateModule } from './update/update.module';
 
 
 @Module({
@@ -31,7 +32,8 @@ import { TelegramModule } from './telegram/telegram.module';
 		},
 	}),
 	AuthModule,
-	TelegramModule
+	TelegramModule,
+	UpdateModule
   ],
   providers: [AppService],
 })
