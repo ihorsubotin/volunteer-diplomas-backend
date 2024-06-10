@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TelegramService } from './telegram.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TelegramConnection } from 'src/entities/telegramConnection.entity';
+import { TelegramConnection } from 'src/entities/telegram-connection.entity';
 import { ConfigModule } from '@nestjs/config';
 import { TelegramController } from './telegram.controller';
 import { UserService } from 'src/user/user.service';

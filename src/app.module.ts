@@ -10,6 +10,7 @@ import { TelegramModule } from './telegram/telegram.module';
 import { UpdateModule } from './update/update.module';
 import { VolunteerModule } from './volunteer/volunteer.module';
 import { EventModule } from './event/event.module';
+import { ActivityCategoryModule } from './activity-category/activity-category.module';
 
 
 @Module({
@@ -37,7 +38,8 @@ import { EventModule } from './event/event.module';
 	TelegramModule,
 	UpdateModule,
 	VolunteerModule,
-	EventModule
+	EventModule,
+	ActivityCategoryModule
   ],
   providers: [AppService],
 })

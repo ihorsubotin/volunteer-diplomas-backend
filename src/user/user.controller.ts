@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, ForbiddenException, Get, NotFoundException, Param, Post, Put, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, ForbiddenException, Get, NotFoundException, Param, Patch, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from 'src/entities/user.entity';
 import CreateUserDTO from './dto/createUserDTO';
@@ -44,7 +44,7 @@ export class UserController {
 	}
 
 	@UseGuards(IsLoggedIn)
-	@Put('password/:id')
+	@Patch('password/:id')
 	async changePassword(@Param() params: any, @Body() newPassword, @Req() req){
 		if(params?.id == 'me'){
 			params.id = req.user.id;
@@ -64,7 +64,7 @@ export class UserController {
 	}
 
 	@UseGuards(IsLoggedIn)
-	@Put(':id')
+	@Patch(':id')
 	async updateUser(@Param() params: any, @Body() userDTO: UpdateUserDTO, @Req() req){
 		if(params?.id == 'me'){
 			params.id = req.user.id;

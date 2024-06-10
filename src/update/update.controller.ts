@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UpdateService } from './update.service';
 import { CreateUpdateDto } from './dto/create-update.dto';
 import { IsTelegram } from 'src/auth/guards/telegram.guard';
@@ -18,7 +18,7 @@ export class UpdateController {
 		return this.updateService.findUnseen();
 	}
 	@UseGuards(IsTelegram)
-	@Put('seen')
+	@Patch('seen')
 	confirmUpdate(@Body() body: number[]){
 		return this.updateService.confirmViews(body);
 	}

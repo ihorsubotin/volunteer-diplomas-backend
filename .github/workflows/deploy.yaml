@@ -21,7 +21,7 @@ jobs:
           cd /root/diplomas/volunteer-diplomas-backend
           git pull origin main
           git status
-          npm install --only=prod
+          npm install --omit=dev
           npm run build
           cp .env dist/.env
           pm2 restart volunteer-backend

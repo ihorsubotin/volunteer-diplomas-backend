@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from 'typeorm';
 import { User } from './user.entity';
-import { TelegramConnection } from './telegramConnection.entity'
+import { TelegramConnection } from './telegram-connection.entity'
 
 @Entity()
 export class Update {
