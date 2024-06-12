@@ -24,6 +24,7 @@ export class VolunteerService {
 		volunteer.organizationName = createVolunteerDto.organizationName;
 		volunteer.user = userToAttach;
 		volunteer.validated = false;
+		volunteer.isSolo = createVolunteerDto.isSolo;
 		volunteer.activities = createVolunteerDto.activities.map(id=>{
 			const ac = new ActivityCategory();
 			ac.id = id;
