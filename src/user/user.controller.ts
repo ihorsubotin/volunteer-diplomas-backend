@@ -22,12 +22,12 @@ export class UserController {
 
 	@UseGuards(IsLoggedIn)
 	@Get(':id')
-	async getUser(@Req() req, @Param() params: any){
-		if(params?.id == 'me'){
-			params.id = req.user.id;
+	async getUser(@Req() req, @Param('id') id: string){
+		if(id == 'me'){
+			id = req.user.id;
 		}
-		if(req.user.isAdmin || (params.id && req.user.id == params.id)){
-			const user =  await this.userService.getExtendedUserById(params.id);
+		if(req.user.isAdmin || (id && req.user.id == id)){
+			const user =  await this.userService.getExtendedUserById(+id);
 			if(user){
 				return user;
 			}else{
@@ -45,13 +45,13 @@ export class UserController {
 
 	@UseGuards(IsLoggedIn)
 	@Patch('password/:id')
-	async changePassword(@Param() params: any, @Body() newPassword, @Req() req){
-		if(params?.id == 'me'){
-			params.id = req.user.id;
+	async changePassword(@Param('id') id: string, @Body() newPassword, @Req() req){
+		if(id == 'me'){
+			id = req.user.id;
 		}
-		if(req.user.isAdmin || (params.id && req.user.id == params.id)){
+		if(req.user.isAdmin || (id && req.user.id == id)){
 			if(newPassword?.password){
-				const success = this.userService.updatePassword(params.id, newPassword.password);
+				const success = this.userService.updatePassword(+id, newPassword.password);
 				if(success){
 					return 'Password changed!';
 				}else{
@@ -65,12 +65,15 @@ export class UserController {
 
 	@UseGuards(IsLoggedIn)
 	@Patch(':id')
-	async updateUser(@Param() params: any, @Body() userDTO: UpdateUserDTO, @Req() req){
-		if(params?.id == 'me'){
-			params.id = req.user.id;
+	async updateUser(@Param('id') id: string, @Body() userDTO: UpdateUserDTO, @Req() req){
+		if(id == 'me'){
+			id = req.user.id;
 		}
-		if(req.user.isAdmin || (params.id && req.user.id == params.id)){
-			const user = await this.userService.updateUser(params.id, userDTO);
+		if(!+id){
+			throw new NotFoundException();
+		}
+		if(req.user.isAdmin || (id && req.user.id == id)){
+			const user = await this.userService.updateUser(+id, userDTO);
 			if(!user){
 				throw new NotFoundException();
 			}
@@ -81,15 +84,15 @@ export class UserController {
 
 	@UseGuards(IsAdmin)
 	@Delete(':id')
-	async deleteUser(@Param() params: any,  @Req() req){
-		if(params?.id == 'me'){
-			params.id = req.user.id;
+	async deleteUser(@Param('id') id: string,  @Req() req){
+		if(id == 'me'){
+			id = req.user.id;
 		}
-		if(params.id && req.user.id == params.id){
+		if(id && req.user.id == id){
 			throw new ForbiddenException("You can't delete yourself");
 		}
 
-		const success = await this.userService.deleteUser(params.id);
+		const success = await this.userService.deleteUser(+id);
 		if(success){
 			return 'Deleted succesfully!';
 		}else{

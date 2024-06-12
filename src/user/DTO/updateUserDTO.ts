@@ -1,17 +1,16 @@
-import { Allow, IsEmail, IsNotEmpty, ValidateIf} from "class-validator";
-import * as ValidatorJS from 'validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export default class UpdateUserDTO{
-	@Allow()
+	@IsOptional()
+	@IsNotEmpty()
 	firstName: string;
-	@Allow()
+	@IsOptional()
+	@IsNotEmpty()
 	lastName: string;
-	@ValidateIf(o=>{
-		if(o.email == undefined) return true;
-		return ValidatorJS.isEmail(o.email);
-	})
-	@Allow()
+	@IsOptional()
+	@IsEmail()
 	email: string;
-	@Allow()
+	@IsOptional()
+	@IsString()
 	region:string;
 }

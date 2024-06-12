@@ -23,17 +23,23 @@ export class ActivityCategoryService {
 		return this.activityRepository.find();
 	}
 
+	async findActivitiesByArray(activities: number[]){
+		const options: any = activities.map(id=>{id: id});
+		return await this.activityRepository.findBy(options);
+	}
+	
 	async update(id: number, updateActivityCategoryDto: UpdateActivityCategoryDto) {
 		if(!id){return null;}
 		const activity = await this.activityRepository.findOne({
 			where: {id:id}
 		});
+		if(!activity){return null;}
 		activity.name = updateActivityCategoryDto.name;
 		this.activityRepository.save(activity);
 		return activity;
 	}
 
-	remove(id: number) {
-		return this.activityRepository.delete(id);
+	async remove(id: number) {
+		return (await this.activityRepository.delete(id)).affected;
 	}
 }

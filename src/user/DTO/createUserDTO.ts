@@ -9,6 +9,6 @@ export default class CreateUserDTO{
 	email: string;
 	@IsNotEmpty()
 	password: string;
-	@Allow()
+	@IsNotEmpty()
 	region:string;
 }

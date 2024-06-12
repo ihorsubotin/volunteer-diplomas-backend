@@ -8,5 +8,6 @@ import { ActivityCategory } from 'src/entities/activity-category.entity';
 	imports: [TypeOrmModule.forFeature([ActivityCategory])],
 	controllers: [ActivityCategoryController],
 	providers: [ActivityCategoryService],
+	exports: [ActivityCategoryService]
 })
 export class ActivityCategoryModule {}

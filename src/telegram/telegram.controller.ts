@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { IsLoggedIn } from 'src/auth/guards/loggedIn.guard';
 import { TelegramService } from './telegram.service';
 import { UserService } from 'src/user/user.service';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 import { IsTelegram } from 'src/auth/guards/telegram.guard';
 
 class loginDTO{
@@ -11,7 +11,7 @@ class loginDTO{
 	token: string;
 	@IsNotEmpty()
 	userInfo: string;
-	@IsNotEmpty()
+	@IsNumber()
 	telegramUser: number;
 }
 

@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { UpdateService } from './update.service';
 import { CreateUpdateDto } from './dto/create-update.dto';
 import { IsTelegram } from 'src/auth/guards/telegram.guard';
+import { ConfirmUpdateDTO } from './dto/confirm-update.dto';
 
 @Controller('update')
 export class UpdateController {
@@ -19,8 +20,8 @@ export class UpdateController {
 	}
 	@UseGuards(IsTelegram)
 	@Patch('seen')
-	confirmUpdate(@Body() body: number[]){
-		return this.updateService.confirmViews(body);
+	confirmUpdate(@Body() body: ConfirmUpdateDTO){
+		return this.updateService.confirmViews(body.confirmed);
 	}
 
 	//   @Get(':id')

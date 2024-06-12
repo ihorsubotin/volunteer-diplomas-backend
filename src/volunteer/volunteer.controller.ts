@@ -1,46 +1,76 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, BadRequestException, NotFoundException, UnauthorizedException, ParseIntPipe } from '@nestjs/common';
 import { VolunteerService } from './volunteer.service';
 import { CreateVolunteerDto } from './dto/create-volunteer.dto';
 import { UpdateVolunteerDto } from './dto/update-volunteer.dto';
 import { IsLoggedIn } from 'src/auth/guards/loggedIn.guard';
 import { UserService } from 'src/user/user.service';
+import { FindVolunteerDto } from './dto/find-volunteer.dto';
+import { IsAdmin } from 'src/auth/guards/admin.guard';
 
 @Controller('volunteer')
 export class VolunteerController {
 	constructor(
 		private volunteerService: VolunteerService,
 		private userService: UserService
-	) { }
+	) {}
 
 	@UseGuards(IsLoggedIn)
 	@Post('account')
 	async createVolunteerAccount(@Req() req, @Body() createVolunteerDto: CreateVolunteerDto) {
-		if (req.session.user.volunteer) {
+		if (req.user.volunteer) {
 			return new BadRequestException('Volunteer is already defined');
 		}
-		const volunteer = await this.volunteerService.create(createVolunteerDto, req.session.user.id);
-		const updatedUser = await this.userService.getExtendedUserById(req.session.user.id);
+		const volunteer = await this.volunteerService.create(createVolunteerDto, req.user.id);
+		const updatedUser = await this.userService.getExtendedUserById(req.user.id);
 		req.session.user = updatedUser;
 		return volunteer;
 	}
 
-	@Get()
-	findAll() {
-		return this.volunteerService.findAll();
+	//TODO
+	@Get('list/:page')
+	find(@Param('page') page: string, @Body() body: FindVolunteerDto) {
+		if(!(+page)){
+			page = '0';
+		}
+		return this.volunteerService.find(+page, body);
 	}
 
 	@Get(':id')
-	findOne(@Param('id') id: string) {
-		return this.volunteerService.findOne(+id);
+	async findOne(@Param('id') id: string, @Req() req) {
+		if(req.session.user && req.session.user.volunteer && id == 'me'){
+			id = req.session.user.volunteer.id;
+		}
+		const volunteer = await this.volunteerService.findFullVolunteer(+id);
+		if(!volunteer){
+			throw new NotFoundException();
+		}
+		return volunteer;
 	}
 
+	@UseGuards(IsAdmin)
+	@Patch(':id/validate')
+	async validate(@Param('id', ParseIntPipe) id: number){
+		console.log(id);
+		const volunteer = await this.volunteerService.validate(id);
+		if(!volunteer){
+			throw new NotFoundException('Volunteer not found');	
+		}
+		return volunteer;
+	}
+
+	@UseGuards(IsLoggedIn)
 	@Patch(':id')
-	update(@Param('id') id: string, @Body() updateVolunteerDto: UpdateVolunteerDto) {
-		return this.volunteerService.update(+id, updateVolunteerDto);
-	}
-
-	@Delete(':id')
-	remove(@Param('id') id: string) {
-		return this.volunteerService.remove(+id);
+	async update(@Param('id') id: string, @Req() req, @Body() updateVolunteerDto: UpdateVolunteerDto) {
+		if(req.user.volunteer && id == 'me'){
+			id = req.user.volunteer.id;
+		}
+		if(req.user.isAdmin || (id && req.user.volunteer && req.user.volunteer.id == id)){
+			const volunteer = await this.volunteerService.update(+id, updateVolunteerDto);
+			if(!volunteer){
+				throw new NotFoundException();
+			}
+			return volunteer;
+		}
+		throw new UnauthorizedException();
 	}
 }

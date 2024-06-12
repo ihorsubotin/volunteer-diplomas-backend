@@ -21,5 +21,5 @@ export class Volunteer {
 
 	@ManyToMany(type=>ActivityCategory)
 	@JoinTable()
-	activity: ActivityCategory[];
+	activities: ActivityCategory[];
 }
