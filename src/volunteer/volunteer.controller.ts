@@ -2,10 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, BadR
 import { VolunteerService } from './volunteer.service';
 import { CreateVolunteerDto } from './dto/create-volunteer.dto';
 import { UpdateVolunteerDto } from './dto/update-volunteer.dto';
-import { IsLoggedIn } from 'src/auth/guards/loggedIn.guard';
-import { UserService } from 'src/user/user.service';
+import { IsLoggedIn } from '../auth/guards/loggedIn.guard';
+import { UserService } from '../user/user.service';
 import { FindVolunteerDto } from './dto/find-volunteer.dto';
-import { IsAdmin } from 'src/auth/guards/admin.guard';
+import { IsAdmin } from '../auth/guards/admin.guard';
 
 @Controller('volunteer')
 export class VolunteerController {

@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, Delete, UseGuards, Patch, NotFoundE
 import { ActivityCategoryService } from './activity-category.service';
 import { CreateActivityCategoryDto } from './dto/create-activity-category.dto';
 import { UpdateActivityCategoryDto } from './dto/update-activity-category.dto';
-import { IsAdmin } from 'src/auth/guards/admin.guard';
+import { IsAdmin } from '../auth/guards/admin.guard';
 
 @Controller('activity-category')
 export class ActivityCategoryController {

@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, HttpCode, HttpStatus, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { IsNotEmpty } from 'class-validator';
-import CreateUserDTO from 'src/user/dto/createUserDTO';
-import { UserService } from 'src/user/user.service';
+import CreateUserDTO from '../user/dto/createUserDTO';
+import { UserService } from '../user/user.service';
 import { IsLoggedIn } from './guards/loggedIn.guard';
 
 class SignInTdo{

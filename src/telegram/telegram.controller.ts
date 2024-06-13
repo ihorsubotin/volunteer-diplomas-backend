@@ -1,10 +1,10 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IsLoggedIn } from 'src/auth/guards/loggedIn.guard';
+import { IsLoggedIn } from '../auth/guards/loggedIn.guard';
 import { TelegramService } from './telegram.service';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import { IsNotEmpty, IsNumber } from 'class-validator';
-import { IsTelegram } from 'src/auth/guards/telegram.guard';
+import { IsTelegram } from '../auth/guards/telegram.guard';
 
 class loginDTO{
 	@IsNotEmpty()

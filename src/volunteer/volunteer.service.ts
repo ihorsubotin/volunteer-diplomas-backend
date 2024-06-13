@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CreateVolunteerDto } from './dto/create-volunteer.dto';
 import { UpdateVolunteerDto } from './dto/update-volunteer.dto';
-import { UserService } from 'src/user/user.service';
-import { Volunteer } from 'src/entities/volunteer.entity';
+import { UserService } from '../user/user.service';
+import { Volunteer } from '../entities/volunteer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ArrayContains, FindManyOptions, In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { FindVolunteerDto } from './dto/find-volunteer.dto';
-import { ActivityCategoryService } from 'src/activity-category/activity-category.service';
-import { ActivityCategory } from 'src/entities/activity-category.entity';
+import { ActivityCategoryService } from '../activity-category/activity-category.service';
 
 @Injectable()
 export class VolunteerService {
@@ -25,11 +24,7 @@ export class VolunteerService {
 		volunteer.user = userToAttach;
 		volunteer.validated = false;
 		volunteer.isSolo = createVolunteerDto.isSolo;
-		volunteer.activities = createVolunteerDto.activities.map(id=>{
-			const ac = new ActivityCategory();
-			ac.id = id;
-			return ac;
-		});
+		volunteer.activities = this.activityCategoryService.convertActivitiesToArray(createVolunteerDto.activities);
 		const {user, ...result} = await this.volunteerRepository.save(volunteer);
 		return result;
 	}
@@ -37,11 +32,15 @@ export class VolunteerService {
 	async find(page: number, params : FindVolunteerDto) {
 		let querry = this.volunteerRepository.createQueryBuilder("volunteer")
 		.innerJoin("volunteer.activities", "activity_category");
-		if(params.isSolo){
-			querry = querry.where("volunteer.isSolo = :isSolo", {isSolo: params.isSolo});
+		if(params.organizationName){
+			const querryString = `%${params.organizationName}%`;
+			querry = querry.andWhere("volunteer.organizationName LIKE :name", {name: querryString});
+		}
+		if(params.isSolo !== undefined){
+			querry = querry.andWhere("volunteer.isSolo = :isSolo", {isSolo: params.isSolo});
 		}
 		if(params.activities?.length > 0){
-			querry = querry.where("activity_category.id IN (:...ids)",{ids: params.activities});
+			querry = querry.andWhere("activity_category.id IN (:...ids)",{ids: params.activities});
 		}
 		const volunteers = await querry.skip(page * 10).take(10).getMany();
 		return volunteers;
@@ -83,11 +82,7 @@ export class VolunteerService {
 			const {activities, ...update} = updateVolunteerDto;
 			this.volunteerRepository.merge(volunteer, update);
 			if(activities){
-				volunteer.activities = activities.map((id: number)=>{
-					const ac = new ActivityCategory();
-					ac.id = id;
-					return ac;
-				});
+				volunteer.activities = this.activityCategoryService.convertActivitiesToArray(activities);
 			}
 			await this.volunteerRepository.save(volunteer);
 			return this.findFullVolunteer(volunteer.id);

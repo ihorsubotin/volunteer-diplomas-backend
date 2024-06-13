@@ -1,9 +1,8 @@
 import { Body, Controller, Delete, ForbiddenException, Get, NotFoundException, Param, Patch, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User } from 'src/entities/user.entity';
 import CreateUserDTO from './dto/createUserDTO';
-import { IsLoggedIn } from 'src/auth/guards/loggedIn.guard';
-import { IsAdmin } from 'src/auth/guards/admin.guard';
+import { IsLoggedIn } from '../auth/guards/loggedIn.guard';
+import { IsAdmin } from '../auth/guards/admin.guard';
 import UpdateUserDTO from './dto/updateUserDTO';
 
 

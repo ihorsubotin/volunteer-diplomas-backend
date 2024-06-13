@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TelegramConnection } from 'src/entities/telegram-connection.entity';
-import { UserService } from 'src/user/user.service';
+import { TelegramConnection } from '../entities/telegram-connection.entity';
+import { UserService } from '../user/user.service';
 import { Repository, IsNull} from 'typeorm';
 import * as uid from 'uid-safe';
 @Injectable()

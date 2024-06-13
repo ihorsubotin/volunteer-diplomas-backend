@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateActivityCategoryDto } from './dto/create-activity-category.dto';
 import { UpdateActivityCategoryDto } from './dto/update-activity-category.dto';
 import { Repository } from 'typeorm';
-import { ActivityCategory } from 'src/entities/activity-category.entity';
+import { ActivityCategory } from '../entities/activity-category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
@@ -26,6 +26,14 @@ export class ActivityCategoryService {
 	async findActivitiesByArray(activities: number[]){
 		const options: any = activities.map(id=>{id: id});
 		return await this.activityRepository.findBy(options);
+	}
+	
+	convertActivitiesToArray(activities: number[]){
+		return activities.map(id=>{
+			const ac = new ActivityCategory();
+			ac.id = id;
+			return ac;
+		});
 	}
 	
 	async update(id: number, updateActivityCategoryDto: UpdateActivityCategoryDto) {

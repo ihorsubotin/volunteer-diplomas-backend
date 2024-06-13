@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UpdateService } from './update.service';
-import { CreateUpdateDto } from './dto/create-update.dto';
-import { IsTelegram } from 'src/auth/guards/telegram.guard';
+import { IsTelegram } from '../auth/guards/telegram.guard';
 import { ConfirmUpdateDTO } from './dto/confirm-update.dto';
 
 @Controller('update')

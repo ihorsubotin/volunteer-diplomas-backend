@@ -1,8 +1,7 @@
-import { Type } from "class-transformer";
-import { Allow, IsArray, IsBoolean, IsNotEmpty, IsNumber, IsString, Validate, ValidateNested } from "class-validator";
-import { ActivityCategory } from "src/entities/activity-category.entity";
+import { IsArray, IsBoolean, IsNumber, IsString, Length, Validate, ValidateNested } from "class-validator";
 
 export class CreateVolunteerDto {
+	@Length(3, 255)
 	@IsString()
 	organizationName: string;
 	@IsBoolean()
