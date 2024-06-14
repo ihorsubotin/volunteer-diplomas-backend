@@ -21,7 +21,6 @@ export class Event {
 	date: Date;
 
 	@ManyToOne(type=>Volunteer)
-	@JoinColumn()
 	volunteer: Volunteer;
 
 	@ManyToMany(type=>ActivityCategory)

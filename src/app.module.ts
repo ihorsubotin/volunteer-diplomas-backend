@@ -11,6 +11,7 @@ import { UpdateModule } from './update/update.module';
 import { VolunteerModule } from './volunteer/volunteer.module';
 import { EventModule } from './event/event.module';
 import { ActivityCategoryModule } from './activity-category/activity-category.module';
+import { ContractorModule } from './contractor/contractor.module';
 
 
 @Module({
@@ -39,7 +40,8 @@ import { ActivityCategoryModule } from './activity-category/activity-category.mo
 	UpdateModule,
 	VolunteerModule,
 	EventModule,
-	ActivityCategoryModule
+	ActivityCategoryModule,
+	ContractorModule
   ],
   providers: [AppService],
 })

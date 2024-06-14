@@ -29,6 +29,17 @@ export class EventController {
 		return 'Success';
 	}
 
+	
+	@UseGuards(IsLoggedIn)
+	@Delete(':id/participate')
+	async leave(@Param('id', ParseIntPipe) id: number, @Req() req){
+		const success = await this.eventService.leave(id, req.user);
+		if(!success){
+			throw new NotFoundException();
+		}
+		return 'Success';
+	}
+
 	@Get('all/:page')
 	async findAll(@Param('page', ParseIntPipe) page: number, @Body() body: FindEventDto) {
 		if (page <= 0) {
@@ -44,6 +55,15 @@ export class EventController {
 			page = 0;
 		}
 		return await this.eventService.findMy(page, body, req.user.volunteer.id);
+	}
+
+	@UseGuards(IsLoggedIn)
+	@Get('participate/:page')
+	async findParticipate(@Param('page', ParseIntPipe) page: number, @Body() body: FindEventDto, @Req() req) {
+		if (isNaN(page) || page <= 0) {
+			page = 0;
+		}
+		return await this.eventService.findParticipate(page, body, req.user.id);
 	}
 
 	@Get(':id')

@@ -26,7 +26,6 @@ export class VolunteerController {
 		return volunteer;
 	}
 
-	//TODO
 	@Get('list/:page')
 	find(@Param('page') page: string, @Body() body: FindVolunteerDto) {
 		if(!(+page)){

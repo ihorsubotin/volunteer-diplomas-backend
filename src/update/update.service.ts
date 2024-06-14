@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUpdateDto } from './dto/create-update.dto';
 import { Update } from '../entities/update.entity'
 import { Repository } from 'typeorm';
+import { Event } from 'src/entities/event.entity';
 
 
 @Injectable()
@@ -12,7 +13,8 @@ export class UpdateService {
 		private updateRepository: Repository<Update>
 	) { }
 
-	create(createUpdateDto: CreateUpdateDto) {
+	createForEvent(event: Event) {
+		event.activities;
 		return 'This action adds a new update';
 	}
 
