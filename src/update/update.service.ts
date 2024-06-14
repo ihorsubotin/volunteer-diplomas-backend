@@ -1,25 +1,45 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateUpdateDto } from './dto/create-update.dto';
-import { Update } from '../entities/update.entity'
+import { TelegramUpdate } from '../entities/telegram-update.entity'
 import { Repository } from 'typeorm';
 import { Event } from 'src/entities/event.entity';
+import { User } from 'src/entities/user.entity';
+import { BrowserUpdate } from 'src/entities/browser-connect,entity';
 
 
 @Injectable()
 export class UpdateService {
 	constructor(
-		@InjectRepository(Update)
-		private updateRepository: Repository<Update>
+		@InjectRepository(TelegramUpdate)
+		private telegramUpdateRepository: Repository<TelegramUpdate>,
+		private browserUpdateRepository: Repository<BrowserUpdate>
 	) { }
 
-	createForEvent(event: Event) {
-		event.activities;
-		return 'This action adds a new update';
+	async createForEvent(event: Event) {
+		const activities = event.activities.map((a)=>a.id);
+		const users: User[] = <any>await this.telegramUpdateRepository.createQueryBuilder("user")
+		.innerJoin("user.contractor", "user")
+		.innerJoin("contractor.activities", "activity_category")
+		.where("activity_category.id IN (:...ids)",{ids: activities}).getMany();
+		const content = `Подія ${event.name} відбудеться ${event.date} в ${event.location}. Не пропустіть!`;
+		const template = {
+			content: content,
+			time: new Date(),
+			seen: false,
+			event: event,
+		}
+		for(const user of users){
+			const browserUpdate = new BrowserUpdate();
+			this.browserUpdateRepository.merge(browserUpdate, template);
+			browserUpdate.user = user;
+			this.browserUpdateRepository.save(browserUpdate);
+		}
+
+
 	}
 
-	findUnseen() {
-		const unseen = this.updateRepository.find({
+	findUnseenTelegram() {
+		const unseen = this.telegramUpdateRepository.find({
 			where: {
 				seen: false
 			},
@@ -38,19 +58,11 @@ export class UpdateService {
 		if(!ids || ids.length == 0){
 			return false;
 		}
-		const update = this.updateRepository.update(ids, {seen: true});
+		const update = this.telegramUpdateRepository.update(ids, {seen: true});
 		return true;
 	}
 
 	findOne(id: number) {
 		return `This action returns a #${id} update`;
-	}
-
-	update(id: number) {
-		return `This action updates a #${id} update`;
-	}
-
-	remove(id: number) {
-		return `This action removes a #${id} update`;
 	}
 }

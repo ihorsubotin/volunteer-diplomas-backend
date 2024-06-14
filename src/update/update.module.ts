@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { UpdateService } from './update.service';
 import { UpdateController } from './update.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Update } from '../entities/update.entity'
+import { Update } from '../entities/telegram-update.entity'
 import { ConfigModule } from '@nestjs/config';
 
 @Module({

@@ -4,7 +4,7 @@ import { TelegramConnection } from './telegram-connection.entity'
 import { Event } from './event.entity';
 
 @Entity()
-export class Update {
+export class BrowserUpdate {
     @PrimaryGeneratedColumn()
     id: number;
 
