@@ -14,11 +14,17 @@ export class Event {
 	@Column("varchar", {length: 10000})
 	description: string;
 
+	@Column()
+	status: string;
+
 	@Column({nullable: true})
 	location: string;
 
 	@Column()
 	date: Date;
+
+	@ManyToOne(type=>Event)
+	previousEvent: Event;
 
 	@ManyToOne(type=>Volunteer)
 	volunteer: Volunteer;

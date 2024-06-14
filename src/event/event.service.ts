@@ -16,7 +16,7 @@ export class EventService {
 		private activityCategoryService: ActivityCategoryService
 	){}
 
-	async create(createEventDto: CreateEventDto, volunteer: Volunteer) {
+	async create(createEventDto: CreateEventDto, volunteer: Volunteer, previousEvent: Event) {
 		const event = new Event();
 		event.name = createEventDto.name;
 		event.description = createEventDto.description;
@@ -24,6 +24,10 @@ export class EventService {
 		event.date = createEventDto.date;
 		event.volunteer = volunteer;
 		event.activities = this.activityCategoryService.convertActivitiesToArray(createEventDto.activities);
+		if(previousEvent){
+			event.previousEvent = previousEvent;
+			event.participants = previousEvent.participants;
+		}
 		return await this.eventRepository.save(event);
 	}
 
@@ -51,7 +55,18 @@ export class EventService {
 		return false;
 	}
 
-	async getFullEvent(eventId: number){
+	async getEventWithParticipants(eventId: number){
+		const event = await this.eventRepository.findOne({
+			where:{id: eventId}, 
+			relations: {volunteer: true, participants: true},
+		});
+		if(!event){
+			return null;
+		}
+		return event;
+	}
+
+	async getFullEvent(eventId: number): Promise<Event>{
 		const event = <any>await this.eventRepository.findOne({
 			where:{id: eventId}, 
 			relations: {volunteer: true, activities: true},
@@ -123,7 +138,7 @@ export class EventService {
 		if(!event){
 			return null;
 		}
-		const {activities, ...fields} = updateEventDto;
+		const {activities, previousEvent, ...fields} = updateEventDto;
 		this.eventRepository.merge(event, fields);
 		await this.eventRepository.save(event);
 		return event;

@@ -17,6 +17,9 @@ export class CreateEventDto {
 	@IsDateString()
 	date: Date;
 
+	@IsNumber()
+	previousEvent: number;
+
 	@IsArray()
 	@IsNumber({},{each: true})
 	activities: number[];

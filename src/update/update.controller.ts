@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Req } from '@nestjs/common';
 import { UpdateService } from './update.service';
 import { IsTelegram } from '../auth/guards/telegram.guard';
 import { ConfirmUpdateDTO } from './dto/confirm-update.dto';
+import { IsLoggedIn } from 'src/auth/guards/loggedIn.guard';
 
 @Controller('update')
 export class UpdateController {
@@ -12,6 +13,15 @@ export class UpdateController {
 	//     return this.updateService.create(createUpdateDto);
 	//   }
 
+	@UseGuards(IsLoggedIn)
+	@Get('my/:page')
+	getMyUpdates(@Param('page', ParseIntPipe) page: number, @Req() req) {
+		if (isNaN(page) || page <= 0) {
+			page = 0;
+		}
+		return this.updateService.getBrowserNotifications(page, req.user);
+	}
+
 	@UseGuards(IsTelegram)
 	@Get('new')
 	getNewUpdates() {
@@ -21,7 +31,7 @@ export class UpdateController {
 	@UseGuards(IsTelegram)
 	@Patch('seen')
 	confirmUpdate(@Body() body: ConfirmUpdateDTO){
-		return this.updateService.confirmViews(body.confirmed);
+		return this.updateService.confirmViewsTelegram(body.confirmed);
 	}
 
 	//   @Get(':id')

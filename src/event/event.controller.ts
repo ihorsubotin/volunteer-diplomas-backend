@@ -12,11 +12,15 @@ export class EventController {
 
 	@UseGuards(IsVolunteer)
 	@Post()
-	create(@Body() createEventDto: CreateEventDto, @Req() req) {
+	async create(@Body() createEventDto: CreateEventDto, @Req() req) {
 		if (!req.user.volunteer.validated) {
 			throw new UnauthorizedException('Volunteer should be validated');
 		}
-		return this.eventService.create(createEventDto, req.user.volunteer);
+		let previousEvent = await this.eventService.getEventWithParticipants(createEventDto.previousEvent);
+		if(!previousEvent && previousEvent.volunteer.id != req.user.volunteer.id){
+			previousEvent = null;
+		}
+		return this.eventService.create(createEventDto, req.user.volunteer, previousEvent);
 	}
 
 	@UseGuards(IsLoggedIn)
