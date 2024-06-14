@@ -15,8 +15,9 @@ export class UpdateController {
 	@UseGuards(IsTelegram)
 	@Get('new')
 	getNewUpdates() {
-		return this.updateService.findUnseen();
+		return this.updateService.findUnseenTelegram();
 	}
+	
 	@UseGuards(IsTelegram)
 	@Patch('seen')
 	confirmUpdate(@Body() body: ConfirmUpdateDTO){

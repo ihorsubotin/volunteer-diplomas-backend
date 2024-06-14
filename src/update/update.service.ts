@@ -12,6 +12,7 @@ export class UpdateService {
 	constructor(
 		@InjectRepository(TelegramUpdate)
 		private telegramUpdateRepository: Repository<TelegramUpdate>,
+		@InjectRepository(BrowserUpdate)
 		private browserUpdateRepository: Repository<BrowserUpdate>
 	) { }
 
