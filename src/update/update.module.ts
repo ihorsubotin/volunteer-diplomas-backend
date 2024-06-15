@@ -3,12 +3,12 @@ import { UpdateService } from './update.service';
 import { UpdateController } from './update.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TelegramUpdate } from '../entities/telegram-update.entity'
-import { ConfigModule } from '@nestjs/config';
 import { BrowserUpdate } from 'src/entities/browser-update.entity';
-import { TelegramService } from 'src/telegram/telegram.service';
+import { TelegramModule } from 'src/telegram/telegram.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TelegramUpdate, BrowserUpdate]), TelegramService],
+  imports: [TypeOrmModule.forFeature([TelegramUpdate, BrowserUpdate]), TelegramModule, ConfigModule],
   controllers: [UpdateController],
   providers: [UpdateService],
 })
