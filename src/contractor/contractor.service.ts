@@ -31,7 +31,7 @@ export class ContractorService {
 	async findFullContractor(id: number) {
 		const contructor = this.contractorRepository.findOne({
 			where: {id: id}, 
-			relations:{user: true, activities: true}
+			relations:{ activities: true}
 		});
 		if(!contructor){
 			return null;
@@ -47,6 +47,6 @@ export class ContractorService {
 			return null;
 		}
 		contractor.activities = this.activtyCategoryService.convertActivitiesToArray(updateContractorDto.activities);
-		this.contractorRepository.save(contractor);
+		return this.contractorRepository.save(contractor);
 	}
 }

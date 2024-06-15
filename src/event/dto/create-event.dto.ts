@@ -2,12 +2,16 @@ import { IsArray, IsDate, IsDateString, IsNumber, IsOptional, IsString, Length }
 
 export class CreateEventDto {
 	@Length(3, 255)
-	@IsString({})
+	@IsString()
 	name: string;
 
 	@Length(3, 10000)
 	@IsString()
 	description: string;
+
+	@Length(3, 255)
+	@IsString()
+	status: string;
 
 	@IsOptional()
 	@Length(3, 255)
@@ -17,6 +21,7 @@ export class CreateEventDto {
 	@IsDateString()
 	date: Date;
 
+	@IsOptional()
 	@IsNumber()
 	previousEvent: number;
 

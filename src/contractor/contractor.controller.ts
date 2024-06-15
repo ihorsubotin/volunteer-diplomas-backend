@@ -30,7 +30,7 @@ export class ContractorController {
 		if (req.user && req.user.contractor && id == 'me') {
 			id = req.user.contractor.id;
 		}
-		if (req.user.isAdmin || (req.user?.contractor?.id == id)) {
+		if ((req.user.isAdmin && !isNaN(+id)) || (req.user?.contractor?.id == id)) {
 			const contractor = await this.contractorService.findFullContractor(+id);
 			if(!contractor){
 				throw new NotFoundException();
@@ -46,7 +46,7 @@ export class ContractorController {
 		if (req.user && req.user.contractor && id == 'me') {
 			id = req.user.contractor.id;
 		}
-		if (req.user.isAdmin || (req.user?.contractor?.id == id)) {
+		if ((req.user.isAdmin && !isNaN(+id)) || (req.user?.contractor?.id == id)) {
 			const contractor = await this.contractorService.update(+id, updateContractorDto);
 			if(!contractor){
 				throw new NotFoundException();

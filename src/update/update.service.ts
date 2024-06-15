@@ -15,16 +15,18 @@ export class UpdateService {
 		private telegramUpdateRepository: Repository<TelegramUpdate>,
 		@InjectRepository(BrowserUpdate)
 		private browserUpdateRepository: Repository<BrowserUpdate>,
+		@InjectRepository(User)
+		private userRepository: Repository<User>,
 		private telegramService: TelegramService
 	) {}
 
 	async createForEvent(event: Event) {
 		const activities = event.activities.map((a)=>a.id);
-		const users: User[] = <any>await this.telegramUpdateRepository.createQueryBuilder("user")
-		.innerJoin("user.contractor", "user")
+		const users: User[] = <any>await this.userRepository.createQueryBuilder("user")
+		.innerJoin("user.contractor", "contractor")
 		.innerJoin("contractor.activities", "activity_category")
 		.where("activity_category.id IN (:...ids)",{ids: activities}).getMany();
-		const content = `Подія ${event.name} відбудеться ${event.date} в ${event.location}. Не пропустіть!`;
+		const content = `Подія "${event.name}" відбудеться ${event.date.toDateString()} в ${event.location}. Не пропустіть!`;
 		const template = {
 			content: content,
 			time: new Date(),
@@ -76,17 +78,31 @@ export class UpdateService {
 		return unseen;
 	}
 
-	confirmViewsTelegram(ids: number[]){
+	async confirmViewsTelegram(ids: number[]){
 		if(!ids || ids.length == 0){
 			return false;
 		}
-		const update = this.telegramUpdateRepository.update(ids, {seen: true});
+		const update = await this.telegramUpdateRepository.update(ids, {seen: true});
+		return true;
+	}
+
+	
+	async confirmViewsBrowser(id: number){
+		if(!id){
+			return false;
+		}
+		const update = await this.browserUpdateRepository.update(id, {seen: true});
 		return true;
 	}
 
 
-
-	findOne(id: number) {
-		return `This action returns a #${id} update`;
+	findOneBrowserUpdate(id: number) {
+		if(!id){
+			return null;
+		}
+		return this.browserUpdateRepository.findOne({
+			where: {id: id},
+			relations: {user: true}
+		});
 	}
 }

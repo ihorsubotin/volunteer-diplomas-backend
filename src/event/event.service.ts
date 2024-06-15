@@ -7,19 +7,22 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Volunteer } from '../entities/volunteer.entity';
 import { ActivityCategoryService } from '../activity-category/activity-category.service';
 import { FindEventDto } from './dto/find-event.dto';
+import { UpdateService } from 'src/update/update.service';
 
 @Injectable()
 export class EventService {
 	constructor(
 		@InjectRepository(Event)
 		private eventRepository: Repository<Event>,
-		private activityCategoryService: ActivityCategoryService
+		private activityCategoryService: ActivityCategoryService,
+		private updateService: UpdateService
 	){}
 
 	async create(createEventDto: CreateEventDto, volunteer: Volunteer, previousEvent: Event) {
 		const event = new Event();
 		event.name = createEventDto.name;
 		event.description = createEventDto.description;
+		event.status = createEventDto.status;
 		event.location = createEventDto.location;
 		event.date = createEventDto.date;
 		event.volunteer = volunteer;
@@ -28,7 +31,9 @@ export class EventService {
 			event.previousEvent = previousEvent;
 			event.participants = previousEvent.participants;
 		}
-		return await this.eventRepository.save(event);
+		await this.eventRepository.save(event);
+		this.updateService.createForEvent(event);
+		return event;
 	}
 
 	async participate(id: number, user){
@@ -56,6 +61,9 @@ export class EventService {
 	}
 
 	async getEventWithParticipants(eventId: number){
+		if(!eventId){
+			return null;
+		}
 		const event = await this.eventRepository.findOne({
 			where:{id: eventId}, 
 			relations: {volunteer: true, participants: true},

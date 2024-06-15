@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Req, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UpdateService } from './update.service';
 import { IsTelegram } from '../auth/guards/telegram.guard';
 import { ConfirmUpdateDTO } from './dto/confirm-update.dto';
@@ -24,14 +24,27 @@ export class UpdateController {
 
 	@UseGuards(IsTelegram)
 	@Get('new')
-	getNewUpdates() {
+	getNewTelegramUpdates() {
 		return this.updateService.findUnseenTelegram();
 	}
 	
 	@UseGuards(IsTelegram)
 	@Patch('seen')
-	confirmUpdate(@Body() body: ConfirmUpdateDTO){
-		return this.updateService.confirmViewsTelegram(body.confirmed);
+	async confirmTelegramUpdate(@Body() body: ConfirmUpdateDTO){
+		return await this.updateService.confirmViewsTelegram(body.confirmed);
+	}
+
+	@UseGuards(IsLoggedIn)
+	@Patch('my/:id')
+	async confirmBrowserUpdate(@Param('id', ParseIntPipe) id: number, @Req() req){
+		const update = await this.updateService.findOneBrowserUpdate(id);
+		if(!update){
+			throw new NotFoundException();
+		}
+		if(update.user.id == req.user.id){
+			return await this.updateService.confirmViewsBrowser(id);
+		}
+		throw new UnauthorizedException();
 	}
 
 	//   @Get(':id')

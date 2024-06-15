@@ -17,7 +17,7 @@ export class EventController {
 			throw new UnauthorizedException('Volunteer should be validated');
 		}
 		let previousEvent = await this.eventService.getEventWithParticipants(createEventDto.previousEvent);
-		if(!previousEvent && previousEvent.volunteer.id != req.user.volunteer.id){
+		if(!previousEvent || previousEvent.volunteer.id != req.user.volunteer.id){
 			previousEvent = null;
 		}
 		return this.eventService.create(createEventDto, req.user.volunteer, previousEvent);
