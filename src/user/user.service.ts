@@ -58,7 +58,9 @@ export class UserService {
 			},
 			relations: {
 				volunteer: true,
-				contractor: true
+				contractor: {
+					activities: true,
+				}
 			}
 		});
 		return user;

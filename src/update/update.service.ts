@@ -54,6 +54,9 @@ export class UpdateService {
 			where: {
 				user: user
 			},
+			relations:{
+				event: true
+			},
 			order: {
 				id: 'ASC'
 			},

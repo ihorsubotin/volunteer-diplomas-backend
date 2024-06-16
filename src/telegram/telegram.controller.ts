@@ -11,8 +11,8 @@ class loginDTO{
 	token: string;
 	@IsNotEmpty()
 	userInfo: string;
-	@IsNumber()
-	telegramUser: number;
+	@IsNotEmpty()
+	telegramUser: string;
 }
 
 @Controller('telegram')

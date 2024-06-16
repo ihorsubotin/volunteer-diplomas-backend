@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TelegramConnection } from '../entities/telegram-connection.entity';
 import { UserService } from '../user/user.service';
-import { Repository, IsNull} from 'typeorm';
+import { Repository, IsNull, Not} from 'typeorm';
 import * as uid from 'uid-safe';
 @Injectable()
 export class TelegramService {
@@ -14,9 +14,29 @@ export class TelegramService {
 	){}
 
 	async generateConnection(userID: number): Promise<TelegramConnection>{
-		const connection = new TelegramConnection();
-		connection.user = await this.userService.findOneById(userID);
-		connection.connectToken = uid.sync(24);
+		const user = await this.userService.findOneById(userID);
+		const oldConnections = await this.connectionRepository.find({
+			where: {
+				user: user, 
+				validUntil: Not(IsNull())
+			}
+		});
+		let connection = null;
+		if(oldConnections.length > 0){
+			let toRemove;
+			if(oldConnections[0].validUntil > new Date(Date.now() - 2*10*1000)){
+				connection = oldConnections[0];
+				toRemove = oldConnections.slice(1);
+			}else{
+				toRemove = oldConnections;
+			}
+			this.connectionRepository.remove(oldConnections);
+		}
+		if(!connection){
+			connection = new TelegramConnection();
+			connection.user = user;
+			connection.connectToken = uid.sync(24);
+		}
 		connection.validUntil = new Date(Date.now() + 10*60*1000);
 		this.connectionRepository.save(connection);
 		return connection;
@@ -82,7 +102,7 @@ export class TelegramService {
 		}
 		return connection;
 	}
-	async saveConnection(connection: TelegramConnection, userInfo: string, telegramUser: number){
+	async saveConnection(connection: TelegramConnection, userInfo: string, telegramUser: string){
 		connection.validUntil = null;
 		connection.userInfo = userInfo;
 		connection.telegramUser = telegramUser;
