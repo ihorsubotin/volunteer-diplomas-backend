@@ -26,7 +26,8 @@ export class UpdateService {
 		.innerJoin("user.contractor", "contractor")
 		.innerJoin("contractor.activities", "activity_category")
 		.where("activity_category.id IN (:...ids)",{ids: activities}).getMany();
-		const content = `Подія "${event.name}" відбудеться ${event.date.toDateString()} в ${event.location}. Не пропустіть!`;
+		const dateString = (new Date(event.date)).toDateString();
+		const content = `Подія "${event.name}" відбудеться ${dateString} в ${event.location}. Не пропустіть!`;
 		const template = {
 			content: content,
 			time: new Date(),
