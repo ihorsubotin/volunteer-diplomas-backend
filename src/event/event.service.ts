@@ -86,10 +86,10 @@ export class EventService {
 		.innerJoin('event.participants', 'user').getCount();
 		return event;
 	}
-
+ 
 	async findAll(page: number, params: FindEventDto) {
 		let querry = this.eventRepository.createQueryBuilder("event")
-		.innerJoin("event.activities", "activity_category");
+		.innerJoin("event.activities", "activity_category").skip(page * 10).take(10);
 		if(params.search){
 			const querryString = `%${params.search}%`;
 			querry = querry.andWhere(
@@ -99,7 +99,9 @@ export class EventService {
 		if(params.activities?.length > 0){
 			querry = querry.andWhere("activity_category.id IN (:...ids)",{ids: params.activities});
 		}
-		const volunteers = await querry.skip(page * 10).take(10).getMany();
+		const volunteers = await querry.getMany();
+		const users = await querry.select('COUNT(user.id)', 'participantsCount').innerJoin('event.participants', 'user').groupBy('event.id').getMany();
+		console.log(users);
 		return volunteers;
 	}
 	
