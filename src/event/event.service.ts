@@ -83,6 +83,7 @@ export class EventService {
 			return null;
 		}
 		event.participantsCount = await this.eventRepository.createQueryBuilder("event")
+		.where("event.id = :id", {id: eventId})
 		.innerJoin('event.participants', 'user').getCount();
 		return event;
 	}
@@ -99,10 +100,13 @@ export class EventService {
 		if(params.activities?.length > 0){
 			querry = querry.andWhere("activity_category.id IN (:...ids)",{ids: params.activities});
 		}
-		const volunteers = await querry.getMany();
-		const users = await querry.select('COUNT(user.id)', 'participantsCount').innerJoin('event.participants', 'user').groupBy('event.id').getMany();
-		console.log(users);
-		return volunteers;
+		const events = <any>await querry.getMany();
+		for (const event of events){
+			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
+			.where("event.id = :id", {id: event.id})
+			.innerJoin('event.participants', 'user').getCount();
+		}
+		return events;
 	}
 	
 	async findMy(page: number, params: FindEventDto, volunteerId: number) {
@@ -120,8 +124,13 @@ export class EventService {
 		if(params.activities?.length > 0){
 			querry = querry.andWhere("activity_category.id IN (:...ids)",{ids: params.activities});
 		}
-		const volunteers = await querry.skip(page * 10).take(10).getMany();
-		return volunteers;
+		const events = <any>await querry.skip(page * 10).take(10).getMany();
+		for (const event of events){
+			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
+			.where("event.id = :id", {id: event.id})
+			.innerJoin('event.participants', 'user').getCount();
+		}
+		return events;
 	}
 
 	async findParticipate(page: number, params: FindEventDto, userId: number) {
@@ -139,8 +148,13 @@ export class EventService {
 		if(params.activities?.length > 0){
 			querry = querry.andWhere("activity_category.id IN (:...ids)",{ids: params.activities});
 		}
-		const volunteers = await querry.skip(page * 10).take(10).getMany();
-		return volunteers;
+		const events = <any>await querry.skip(page * 10).take(10).getMany();
+		for (const event of events){
+			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
+			.where("event.id = :id", {id: event.id})
+			.innerJoin('event.participants', 'user').getCount();
+		}
+		return events;
 	}
 
 	async update(id: number, updateEventDto: UpdateEventDto) {

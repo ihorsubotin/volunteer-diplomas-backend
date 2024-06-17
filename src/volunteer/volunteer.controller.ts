@@ -26,7 +26,7 @@ export class VolunteerController {
 		return volunteer;
 	}
 
-	@Get('list/:page')
+	@Post('list/:page')
 	find(@Param('page') page: string, @Body() body: FindVolunteerDto) {
 		if(!(+page)){
 			page = '0';

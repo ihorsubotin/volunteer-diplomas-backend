@@ -44,7 +44,7 @@ export class EventController {
 		return 'Success';
 	}
 
-	@Get('all/:page')
+	@Post('all/:page')
 	async findAll(@Param('page', ParseIntPipe) page: number, @Body() body: FindEventDto) {
 		if (page <= 0) {
 			page = 0;
@@ -53,7 +53,7 @@ export class EventController {
 	}
 
 	@UseGuards(IsVolunteer)
-	@Get('my/:page')
+	@Post('my/:page')
 	async findMy(@Param('page', ParseIntPipe) page: number, @Body() body: FindEventDto, @Req() req) {
 		if (isNaN(page) || page <= 0) {
 			page = 0;
@@ -62,7 +62,7 @@ export class EventController {
 	}
 
 	@UseGuards(IsLoggedIn)
-	@Get('participate/:page')
+	@Post('participate/:page')
 	async findParticipate(@Param('page', ParseIntPipe) page: number, @Body() body: FindEventDto, @Req() req) {
 		if (isNaN(page) || page <= 0) {
 			page = 0;
