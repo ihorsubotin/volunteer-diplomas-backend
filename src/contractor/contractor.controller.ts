@@ -15,10 +15,13 @@ export class ContractorController {
 	@UseGuards(IsLoggedIn)
 	@Post()
 	async create(@Body() createContractorDto: CreateContractorDto, @Req() req) {
+		let contractor;
 		if (req.user.contractor) {
-			return new BadRequestException('Contractor is already defined');
+			contractor = await this.contractorService.findFullContractor(req.user.contractor.id);
+			contractor = await this.contractorService.update(contractor.id, createContractorDto);
+		}else{
+			contractor = await this.contractorService.create(createContractorDto, req.user);
 		}
-		const contractor = await this.contractorService.create(createContractorDto, req.user);
 		const updatedUser = await this.userService.getExtendedUserById(req.user.id);
 		req.session.user = updatedUser;
 		return contractor;
