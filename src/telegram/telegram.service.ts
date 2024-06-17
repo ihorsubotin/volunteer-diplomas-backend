@@ -102,10 +102,29 @@ export class TelegramService {
 		}
 		return connection;
 	}
+
 	async saveConnection(connection: TelegramConnection, userInfo: string, telegramUser: string){
 		connection.validUntil = null;
 		connection.userInfo = userInfo;
 		connection.telegramUser = telegramUser;
 		this.connectionRepository.save(connection);
+	}
+
+	async getUserByTelegram(telegramId: string){
+		if(!telegramId){
+			return null;
+		}
+		const connection = await this.connectionRepository.findOne({
+			where:{
+				telegramUser: telegramId	
+			},
+			relations:{
+				user: true
+			}
+		});
+		if(!connection){
+			return null;
+		}
+		return connection.user;
 	}
 }

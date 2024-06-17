@@ -5,10 +5,16 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { IsVolunteer } from '../auth/guards/volunteer.guard';
 import { FindEventDto } from './dto/find-event.dto';
 import { IsLoggedIn } from '../auth/guards/loggedIn.guard';
+import { FindWithTelegramId } from './dto/telegram-id.dto';
+import { IsTelegram } from 'src/auth/guards/telegram.guard';
+import { TelegramService } from 'src/telegram/telegram.service';
 
 @Controller('event')
 export class EventController {
-	constructor(private readonly eventService: EventService) { }
+	constructor(
+		private readonly eventService: EventService,
+		private readonly telegramService: TelegramService
+	) { }
 
 	@UseGuards(IsVolunteer)
 	@Post()
@@ -68,6 +74,19 @@ export class EventController {
 			page = 0;
 		}
 		return await this.eventService.findParticipate(page, body, req.user.id);
+	}
+
+	@UseGuards(IsTelegram)
+	@Post('telegram-participate/:page')
+	async findTelegramParticipate(@Param('page', ParseIntPipe) page: number, @Body() body: FindWithTelegramId) {
+		if (isNaN(page) || page <= 0) {
+			page = 0;
+		}
+		const user = await this.telegramService.getUserByTelegram(body.telegramId);
+		if(!user){
+			throw new NotFoundException('Telegram user not found');
+		}
+		return await this.eventService.findParticipate(page, new FindEventDto(), user.id);
 	}
 
 	@Get(':id')
