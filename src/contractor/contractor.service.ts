@@ -18,7 +18,8 @@ export class ContractorService {
 		const contractor = new Contractor();
 		contractor.activities = this.activtyCategoryService.convertActivitiesToArray(createContractorDto.activities);
 		contractor.user = user;
-		return await this.contractorRepository.save(contractor);
+		await this.contractorRepository.save(contractor);
+		return contractor;
 	}
 
 	async findContractorsByActivities(activities: number[]) {

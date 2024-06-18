@@ -11,5 +11,6 @@ import { UserModule } from 'src/user/user.module';
   imports: [TypeOrmModule.forFeature([Contractor]), ActivityCategoryModule, UserModule],
   controllers: [ContractorController],
   providers: [ContractorService],
+  exports: [ContractorService]
 })
 export class ContractorModule {}

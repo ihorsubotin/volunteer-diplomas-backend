@@ -7,16 +7,16 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({nullable: true})
   email: string;
 
-  @Column()
+  @Column({nullable: true})
   passwordHash: string;
 
-  @Column()
+  @Column({nullable: true})
   firstName: string;
 
-  @Column()
+  @Column({nullable: true})
   lastName: string;
 
   @Column({ default: false })
@@ -32,4 +32,7 @@ export class User {
   @OneToOne(type=>Contractor, contractor=>contractor.user)
   @JoinColumn()
   contractor: Contractor;
+
+  @Column({default: false})
+  isPartial: boolean;
 }

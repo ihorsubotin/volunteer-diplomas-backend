@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, HttpCode, HttpStatus, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { IsNotEmpty } from 'class-validator';
-import CreateUserDTO from '../user/dto/createUserDTO';
+import CreateUserDTO from '../user/dto/change-user.dto';
 import { UserService } from '../user/user.service';
 import { IsLoggedIn } from './guards/loggedIn.guard';
 
@@ -22,8 +22,11 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	@Post('register')
 	async register(@Req() req, @Body() userDTO: CreateUserDTO){
-		let {id} = await this.userService.createUser(userDTO);
-		const user = await this.userService.getExtendedUserById(id);
+		let user: any = await this.userService.createUser(userDTO);
+		if(!user){
+			throw new UnauthorizedException();
+		}
+		user = await this.userService.getExtendedUserById(user.id);
 		req.session.user = user;
 		return req.session.user;
 	}

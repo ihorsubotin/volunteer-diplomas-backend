@@ -4,14 +4,28 @@ import { TelegramConnection } from '../entities/telegram-connection.entity';
 import { UserService } from '../user/user.service';
 import { Repository, IsNull, Not} from 'typeorm';
 import * as uid from 'uid-safe';
+import { CreateAccountDto } from './dto/create-account.dto';
+import { ContractorService } from 'src/contractor/contractor.service';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class TelegramService {
 	
 	constructor(
 		@InjectRepository(TelegramConnection)
 		private connectionRepository: Repository<TelegramConnection>,
-		private userService: UserService
+		private configService: ConfigService,
+		private userService: UserService,
+		private contractorService: ContractorService
 	){}
+
+	async createAccount(createAccountDto: CreateAccountDto){
+		const user = await this.userService.createPartialUser(createAccountDto);
+		const contractor = await this.contractorService.create({activities: createAccountDto.activities}, user);
+		console.log(contractor);
+		const connection = await this.generateConnection(user.id);
+		await this.saveConnection(connection, createAccountDto.userInfo, createAccountDto.telegramUser);
+		return await this.userService.getExtendedUserById(user.id);
+ 	}
 
 	async generateConnection(userID: number): Promise<TelegramConnection>{
 		const user = await this.userService.findOneById(userID);
@@ -38,7 +52,7 @@ export class TelegramService {
 			connection.connectToken = uid.sync(24);
 		}
 		connection.validUntil = new Date(Date.now() + 10*60*1000);
-		this.connectionRepository.save(connection);
+		await this.connectionRepository.save(connection);
 		return connection;
 	}
 
@@ -100,6 +114,9 @@ export class TelegramService {
 		if(connection.validUntil.getTime() < Date.now()){
 			return null;
 		}
+		if(connection.user){
+			return null;
+		}
 		return connection;
 	}
 
@@ -107,7 +124,7 @@ export class TelegramService {
 		connection.validUntil = null;
 		connection.userInfo = userInfo;
 		connection.telegramUser = telegramUser;
-		this.connectionRepository.save(connection);
+		await this.connectionRepository.save(connection);
 	}
 
 	async getUserByTelegram(telegramId: string){
@@ -126,5 +143,25 @@ export class TelegramService {
 			return null;
 		}
 		return connection.user;
+	}
+
+	async generateLink(telegramUser: string){
+		const connection = await this.connectionRepository.findOne({
+			where: {telegramUser: telegramUser},
+			relations: {user: true}
+		});
+		connection.validUntil = new Date(Date.now() + 30 * 60 * 1000);
+		await this.connectionRepository.save(connection);
+		const link = `${this.configService.get('REGISTER_URL')}?token=${connection.connectToken}&firstName=${encodeURI(connection.user.firstName)}&region=${encodeURI(connection.user.region)}`;
+		return link;
+	}
+
+	async logout(telegramUser: string){
+		const connection = await this.connectionRepository.findOne({where:{telegramUser: telegramUser}});
+		if(connection){
+			await this.connectionRepository.delete(connection.id);
+			return true;
+		}
+		return false;
 	}
 }

@@ -2,16 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
-import CreateUserDTO from './dto/createUserDTO';
+import CreateUserDTO from './dto/change-user.dto';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import UpdateUserDTO from './dto/updateUserDTO';
+import UpdateUserDTO from './dto/update-user.dto';
+import { CreateAccountDto } from 'src/telegram/dto/create-account.dto';
+import { TelegramConnection } from 'src/entities/telegram-connection.entity';
 
 @Injectable()
 export class UserService {
 	constructor(
 		@InjectRepository(User)
 		private userRepository: Repository<User>,
+		@InjectRepository(TelegramConnection)
+		private connectionRepository: Repository<TelegramConnection>,
 		private config: ConfigService,
 	){}
 
@@ -20,7 +24,25 @@ export class UserService {
 	}
 
 	async createUser(user: CreateUserDTO): Promise<User>{
-		let userObj = new User();
+		let userObj;
+		if(user.token){
+			const connection = await this.connectionRepository.findOne({
+				where: {connectToken: user.token},
+				relations: {user: true}
+			})
+			if(!connection){
+				return null;
+			}
+			if(connection.validUntil < new Date()){
+				return null;
+			}
+			connection.validUntil = null;
+			this.connectionRepository.save(connection);
+			userObj = connection.user;
+			userObj.isPartial = false;
+		}else{
+			userObj = new User();
+		}
 		this.userRepository.merge(userObj, user);
 		userObj.passwordHash = "";
 		await this.userRepository.save(userObj);
@@ -28,6 +50,15 @@ export class UserService {
 		let saltRounds = Number(this.config.get('SALT_ROUNDS'));
 		userObj.passwordHash = await bcrypt.hash(saltedPassword, saltRounds);
 		await this.userRepository.save(userObj);  
+		return userObj;
+	}
+
+	async createPartialUser(user: CreateAccountDto){
+		const userObj = new User();
+		userObj.firstName = user.name;
+		userObj.region = user.region;
+		userObj.isPartial = true;
+		await this.userRepository.save(userObj);
 		return userObj;
 	}
 

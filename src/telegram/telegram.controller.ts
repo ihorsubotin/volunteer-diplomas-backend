@@ -3,18 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { IsLoggedIn } from '../auth/guards/loggedIn.guard';
 import { TelegramService } from './telegram.service';
 import { UserService } from '../user/user.service';
-import { IsNotEmpty, IsNumber } from 'class-validator';
 import { IsTelegram } from '../auth/guards/telegram.guard';
-
-class loginDTO{
-	@IsNotEmpty()
-	token: string;
-	@IsNotEmpty()
-	userInfo: string;
-	@IsNotEmpty()
-	telegramUser: string;
-}
-
+import { LoginDTO } from './dto/telegram-login.dto'
+import { CreateAccountDto } from './dto/create-account.dto';
+import { TelegramUserDto } from './dto/logout.dto';
+ 
 @Controller('telegram')
 export class TelegramController {
 	constructor (
@@ -57,13 +50,49 @@ export class TelegramController {
 
 	@UseGuards(IsTelegram)
 	@Post('login')
-	async loginViaToken(@Req() req, @Body() body: loginDTO){
+	async loginViaToken(@Req() req, @Body() body: LoginDTO){
 		const connection = await this.telegramService.validateConnection(body.token);
 		if(!connection){
 			throw new UnauthorizedException();
 		}
+		const oldUser = await this.telegramService.getUserByTelegram(body.telegramUser);
+		if(oldUser){
+			throw new UnauthorizedException('Telegram id already registered');
+		}
 		const {passwordHash, ...user} = connection.user;
 		await this.telegramService.saveConnection(connection, body.userInfo, body.telegramUser);
 		return user;
+	}
+
+	@UseGuards(IsTelegram)
+	@Post('create-account')
+	async newAccount(@Body() createAccountDto: CreateAccountDto){
+		const oldUser = await this.telegramService.getUserByTelegram(createAccountDto.telegramUser);
+		if(oldUser){
+			throw new UnauthorizedException('Telegram id already registered');
+		}
+		const account = await this.telegramService.createAccount(createAccountDto);
+		return account;
+	}
+
+	@UseGuards(IsTelegram)
+	@Post('generate-register-link')
+	async generateLink(@Body() generateLink: TelegramUserDto){
+		const user = await this.telegramService.getUserByTelegram(generateLink.telegramUser);
+		if(!user){
+			throw new NotFoundException('User not found');
+		}
+		if(!user.isPartial){
+			throw new UnauthorizedException('User is not partial');
+		}
+		const link = await this.telegramService.generateLink(generateLink.telegramUser);
+		return {url: link};
+	}
+
+	@UseGuards(IsTelegram)
+	@Post('logout')
+	async logout(@Body() logoutDto: TelegramUserDto){
+		const success = this.telegramService.logout(logoutDto.telegramUser);
+		return success;
 	}
 }

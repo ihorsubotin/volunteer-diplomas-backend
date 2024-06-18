@@ -1,9 +1,10 @@
 import { Body, Controller, Delete, ForbiddenException, Get, NotFoundException, Param, Patch, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import CreateUserDTO from './dto/createUserDTO';
+import CreateUserDTO from './dto/change-user.dto';
 import { IsLoggedIn } from '../auth/guards/loggedIn.guard';
 import { IsAdmin } from '../auth/guards/admin.guard';
-import UpdateUserDTO from './dto/updateUserDTO';
+import UpdateUserDTO from './dto/update-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 
 
@@ -44,19 +45,18 @@ export class UserController {
 
 	@UseGuards(IsLoggedIn)
 	@Patch('password/:id')
-	async changePassword(@Param('id') id: string, @Body() newPassword, @Req() req){
+	async changePassword(@Param('id') id: string, @Body() body: ChangePasswordDto, @Req() req){
 		if(id == 'me'){
 			id = req.user.id;
 		}
 		if(req.user.isAdmin || (id && req.user.id == id)){
-			if(newPassword?.password){
-				const success = this.userService.updatePassword(+id, newPassword.password);
+			if(body?.password){
+				const success = this.userService.updatePassword(+id, body.password);
 				if(success){
 					return 'Password changed!';
 				}else{
 					throw new NotFoundException();
 				}
-				
 			}
 		}
 		throw new UnauthorizedException();
