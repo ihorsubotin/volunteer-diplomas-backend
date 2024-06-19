@@ -21,7 +21,6 @@ export class TelegramService {
 	async createAccount(createAccountDto: CreateAccountDto){
 		const user = await this.userService.createPartialUser(createAccountDto);
 		const contractor = await this.contractorService.create({activities: createAccountDto.activities}, user);
-		console.log(contractor);
 		const connection = await this.generateConnection(user.id);
 		await this.saveConnection(connection, createAccountDto.userInfo, createAccountDto.telegramUser);
 		return await this.userService.getExtendedUserById(user.id);
