@@ -8,10 +8,10 @@ export class TelegramUpdate {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(type=> TelegramConnection, {nullable: false})
+    @ManyToOne(type=> TelegramConnection, {nullable: false, onDelete: 'CASCADE'})
     connection: TelegramConnection;
 
-    @ManyToOne(type=>Event, {nullable: false})
+    @ManyToOne(type=>Event, {nullable: false, onDelete: 'CASCADE'})
     event: Event;
 
     @Column()
