@@ -90,7 +90,7 @@ export class EventService {
  
 	async findAll(page: number, params: FindEventDto) {
 		let querry = this.eventRepository.createQueryBuilder("event")
-		.innerJoin("event.activities", "activity_category").skip(page * 10).take(10);
+		.innerJoin("event.activities", "activity_category").skip(page * 10).take(10).orderBy("id", "DESC");
 		if(params.search){
 			const querryString = `%${params.search}%`;
 			querry = querry.andWhere(
@@ -124,7 +124,7 @@ export class EventService {
 		if(params.activities?.length > 0){
 			querry = querry.andWhere("activity_category.id IN (:...ids)",{ids: params.activities});
 		}
-		const events = <any>await querry.skip(page * 10).take(10).getMany();
+		const events = <any>await querry.skip(page * 10).take(10).orderBy("id", "DESC").getMany();
 		for (const event of events){
 			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
 			.where("event.id = :id", {id: event.id})
@@ -148,7 +148,7 @@ export class EventService {
 		if(params.activities?.length > 0){
 			querry = querry.andWhere("activity_category.id IN (:...ids)",{ids: params.activities});
 		}
-		const events = <any>await querry.skip(page * 10).take(10).getMany();
+		const events = <any>await querry.skip(page * 10).take(10).orderBy("id", "DESC").getMany();
 		for (const event of events){
 			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
 			.where("event.id = :id", {id: event.id})

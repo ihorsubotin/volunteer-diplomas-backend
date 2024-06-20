@@ -151,7 +151,7 @@ export class TelegramService {
 		});
 		connection.validUntil = new Date(Date.now() + 30 * 60 * 1000);
 		await this.connectionRepository.save(connection);
-		const link = `${this.configService.get('REGISTER_URL')}?token=${connection.connectToken}&firstName=${encodeURI(connection.user.firstName)}&region=${encodeURI(connection.user.region)}`;
+		const link = `${this.configService.get('REGISTER_URL')}?token=${connection.connectToken}&firstName=${encodeURI(connection.user.firstName)}`; //&region=${encodeURI(connection.user.region)}
 		return link;
 	}
 
