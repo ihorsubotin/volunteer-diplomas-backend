@@ -113,7 +113,7 @@ export class TelegramService {
 		if(connection.validUntil.getTime() < Date.now()){
 			return null;
 		}
-		if(connection.user){
+		if(connection.user.isPartial){
 			return null;
 		}
 		return connection;
