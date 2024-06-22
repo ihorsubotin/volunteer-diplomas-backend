@@ -26,7 +26,7 @@ export class EventController {
 		if(!previousEvent || previousEvent.volunteer.id != req.user.volunteer.id){
 			previousEvent = null;
 		}
-		return this.eventService.create(createEventDto, req.user.volunteer, previousEvent);
+		return this.eventService.create(createEventDto, req.user, previousEvent);
 	}
 
 	@UseGuards(IsLoggedIn)

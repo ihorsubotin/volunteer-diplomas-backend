@@ -88,7 +88,9 @@ export class UserService {
 				id: id
 			},
 			relations: {
-				volunteer: true,
+				volunteer: {
+					activities: true,
+				},
 				contractor: {
 					activities: true,
 				}

@@ -90,7 +90,8 @@ export class EventService {
  
 	async findAll(page: number, params: FindEventDto) {
 		let querry = this.eventRepository.createQueryBuilder("event")
-		.innerJoin("event.activities", "activity_category").skip(page * 10).take(10).orderBy("id", "DESC");
+		.innerJoin("event.activities", "activity_category")
+		.skip(page * 10).take(10).orderBy("event.id", "DESC");
 		if(params.search){
 			const querryString = `%${params.search}%`;
 			querry = querry.andWhere(
@@ -102,6 +103,10 @@ export class EventService {
 		}
 		const events = <any>await querry.getMany();
 		for (const event of events){
+			const {volunteerId} = await this.eventRepository.createQueryBuilder("event")
+			.where("event.id = :id", {id: event.id}).select("event.volunteerId").getRawOne();
+			event.volunteer = new Volunteer();
+			event.volunteer.id = volunteerId;
 			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
 			.where("event.id = :id", {id: event.id})
 			.innerJoin('event.participants', 'user').getCount();
@@ -124,8 +129,12 @@ export class EventService {
 		if(params.activities?.length > 0){
 			querry = querry.andWhere("activity_category.id IN (:...ids)",{ids: params.activities});
 		}
-		const events = <any>await querry.skip(page * 10).take(10).orderBy("id", "DESC").getMany();
+		const events = <any>await querry.skip(page * 10).take(10).orderBy("event.id", "DESC").getMany();
 		for (const event of events){
+			const {volunteerId} = await this.eventRepository.createQueryBuilder("event")
+			.where("event.id = :id", {id: event.id}).select("event.volunteerId").getRawOne();
+			event.volunteer = new Volunteer();
+			event.volunteer.id = volunteerId;
 			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
 			.where("event.id = :id", {id: event.id})
 			.innerJoin('event.participants', 'user').getCount();
@@ -148,8 +157,12 @@ export class EventService {
 		if(params.activities?.length > 0){
 			querry = querry.andWhere("activity_category.id IN (:...ids)",{ids: params.activities});
 		}
-		const events = <any>await querry.skip(page * 10).take(10).orderBy("id", "DESC").getMany();
+		const events = <any>await querry.skip(page * 10).take(10).orderBy("event.id", "DESC").getMany();
 		for (const event of events){
+			const {volunteerId} = await this.eventRepository.createQueryBuilder("event")
+			.where("event.id = :id", {id: event.id}).select("event.volunteerId").getRawOne();
+			event.volunteer = new Volunteer();
+			event.volunteer.id = volunteerId;
 			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
 			.where("event.id = :id", {id: event.id})
 			.innerJoin('event.participants', 'user').getCount();
