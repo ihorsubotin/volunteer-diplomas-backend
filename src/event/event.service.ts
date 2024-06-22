@@ -103,10 +103,8 @@ export class EventService {
 		}
 		const events = <any>await querry.getMany();
 		for (const event of events){
-			const {volunteerId} = await this.eventRepository.createQueryBuilder("event")
-			.where("event.id = :id", {id: event.id}).select("event.volunteerId").getRawOne();
-			event.volunteer = new Volunteer();
-			event.volunteer.id = volunteerId;
+			const {volunteer} = await this.eventRepository.findOne({where: {id: event.id}, relations: {volunteer: true}});
+			event.volunteer = volunteer;
 			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
 			.where("event.id = :id", {id: event.id})
 			.innerJoin('event.participants', 'user').getCount();
@@ -131,10 +129,8 @@ export class EventService {
 		}
 		const events = <any>await querry.skip(page * 10).take(10).orderBy("event.id", "DESC").getMany();
 		for (const event of events){
-			const {volunteerId} = await this.eventRepository.createQueryBuilder("event")
-			.where("event.id = :id", {id: event.id}).select("event.volunteerId").getRawOne();
-			event.volunteer = new Volunteer();
-			event.volunteer.id = volunteerId;
+			const {volunteer} = await this.eventRepository.findOne({where: {id: event.id}, relations: {volunteer: true}});
+			event.volunteer = volunteer;
 			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
 			.where("event.id = :id", {id: event.id})
 			.innerJoin('event.participants', 'user').getCount();
@@ -159,10 +155,8 @@ export class EventService {
 		}
 		const events = <any>await querry.skip(page * 10).take(10).orderBy("event.id", "DESC").getMany();
 		for (const event of events){
-			const {volunteerId} = await this.eventRepository.createQueryBuilder("event")
-			.where("event.id = :id", {id: event.id}).select("event.volunteerId").getRawOne();
-			event.volunteer = new Volunteer();
-			event.volunteer.id = volunteerId;
+			const {volunteer} = await this.eventRepository.findOne({where: {id: event.id}, relations: {volunteer: true}});
+			event.volunteer = volunteer;
 			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
 			.where("event.id = :id", {id: event.id})
 			.innerJoin('event.participants', 'user').getCount();
