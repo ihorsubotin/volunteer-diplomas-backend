@@ -18,7 +18,7 @@ jobs:
         script: |
           export NVM_DIR=~/.nvm
           source ~/.nvm/nvm.sh
-          cd ~/volunteer-diplomas-backend
+          cd /root/diplomas/volunteer-diplomas-backend
           git pull origin main
           git status
           npm install --omit=dev
@@ -36,7 +36,7 @@ jobs:
         script: |
           export NVM_DIR=~/.nvm
           source ~/.nvm/nvm.sh
-          cd ~/volunteer-diplomas-backend
+          cd /root/diplomas/volunteer-diplomas-backend
           echo "hello"
   build:
     needs: [download, test]
@@ -52,6 +52,6 @@ jobs:
         script: |
           export NVM_DIR=~/.nvm
           source ~/.nvm/nvm.sh
-          cd ~/volunteer-diplomas-backend
+          cd /root/diplomas/volunteer-diplomas-backend
           npm run build
           pm2 restart volunteer-backend
