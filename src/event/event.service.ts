@@ -8,6 +8,7 @@ import { Volunteer } from '../entities/volunteer.entity';
 import { ActivityCategoryService } from '../activity-category/activity-category.service';
 import { FindEventDto } from './dto/find-event.dto';
 import { UpdateService } from 'src/update/update.service';
+import { User } from 'src/entities/user.entity';
 
 @Injectable()
 export class EventService {
@@ -18,18 +19,20 @@ export class EventService {
 		private updateService: UpdateService
 	){}
 
-	async create(createEventDto: CreateEventDto, volunteer: Volunteer, previousEvent: Event) {
+	async create(createEventDto: CreateEventDto, user: User, previousEvent: Event) {
 		const event = new Event();
 		event.name = createEventDto.name;
 		event.description = createEventDto.description;
 		event.status = createEventDto.status;
 		event.location = createEventDto.location;
 		event.date = createEventDto.date;
-		event.volunteer = volunteer;
+		event.volunteer = user.volunteer;
 		event.activities = this.activityCategoryService.convertActivitiesToArray(createEventDto.activities);
 		if(previousEvent){
 			event.previousEvent = previousEvent;
 			event.participants = previousEvent.participants;
+		}else{
+			event.participants = [user];
 		}
 		await this.eventRepository.save(event);
 		this.updateService.createForEvent(event);
