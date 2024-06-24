@@ -20,7 +20,9 @@ export class ActivityCategoryService {
 	}
 
 	findAll() {
-		return this.activityRepository.find();
+		return this.activityRepository.find({
+			order: {name:'ASC'}
+		});
 	}
 
 	async findActivitiesByArray(activities: number[]){
