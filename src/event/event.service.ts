@@ -99,7 +99,7 @@ export class EventService {
 		let prev = thisEvent.previousEvent;
 		const ret = [];
 		while(prev){
-			let {previousEvent, ...event} = <any>await this.eventRepository.findOne({where: {id: prev.id}, relations: {previousEvent: true}});
+			let {previousEvent, ...event} = <any>await this.eventRepository.findOne({where: {id: prev.id}, relations: {previousEvent: true, volunteer: true}});
 			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
 			.where("event.id = :id", {id: event.id})
 			.innerJoin('event.participants', 'user').getCount();
@@ -122,6 +122,13 @@ export class EventService {
 		if(params.activities?.length > 0){
 			querry = querry.andWhere("activity_category.id IN (:...ids)",{ids: params.activities});
 		}
+		if(params.finished !== undefined){
+			if(params.finished){
+				querry = querry.andWhere("event.status = 'Завершено'");
+			}else{
+				querry = querry.andWhere("event.status != 'Завершено'")
+			}
+		}
 		const events = <any>await querry.getMany();
 		for (const event of events){
 			const {volunteer} = await this.eventRepository.findOne({where: {id: event.id}, relations: {volunteer: true}});
@@ -138,7 +145,13 @@ export class EventService {
 		.innerJoin("event.activities", "activity_category")
 		.innerJoin("event.volunteer", "volunteer")
 		.where('volunteer.id = :id', {id: volunteerId});
-
+		if(params.finished !== undefined){
+			if(params.finished){
+				querry = querry.andWhere("event.status = 'Завершено'");
+			}else{
+				querry = querry.andWhere("event.status != 'Завершено'")
+			}
+		}
 		if(params.search){
 			const querryString = `%${params.search}%`;
 			querry = querry.andWhere(
@@ -164,7 +177,13 @@ export class EventService {
 		.innerJoin("event.activities", "activity_category")
 		.innerJoin("event.participants", "user")
 		.where('user.id = :id', {id: userId});
-
+		if(params.finished !== undefined){
+			if(params.finished){
+				querry = querry.andWhere("event.status = 'Завершено'");
+			}else{
+				querry = querry.andWhere("event.status != 'Завершено'")
+			}
+		}
 		if(params.search){
 			const querryString = `%${params.search}%`;
 			querry = querry.andWhere(

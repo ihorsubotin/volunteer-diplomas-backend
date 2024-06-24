@@ -1,4 +1,4 @@
-import { IsArray, IsNumber, IsOptional, IsString, Length } from "class-validator";
+import { IsArray, IsBoolean, IsNumber, IsOptional, IsString, Length } from "class-validator";
 
 export class FindEventDto {
 	@IsOptional()	
@@ -10,4 +10,8 @@ export class FindEventDto {
 	@IsArray()
 	@IsNumber({},{each: true})
 	activities: number[];
+
+	@IsOptional()
+	@IsBoolean()
+	finished: boolean;
 }
