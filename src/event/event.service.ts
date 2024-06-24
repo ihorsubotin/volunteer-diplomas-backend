@@ -91,8 +91,22 @@ export class EventService {
 		return event;
 	}
  
-	async getPreviousEvents(){
-
+	async getPreviousEvents(eventId: number){
+		const thisEvent = await this.eventRepository.findOne({where: {id: eventId}, relations: {previousEvent: true}});
+		if(!thisEvent){
+			return false;
+		}
+		let prev = thisEvent.previousEvent;
+		const ret = [];
+		while(prev){
+			let {previousEvent, ...event} = <any>await this.eventRepository.findOne({where: {id: prev.id}, relations: {previousEvent: true}});
+			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
+			.where("event.id = :id", {id: event.id})
+			.innerJoin('event.participants', 'user').getCount();
+			ret.push(event);
+			prev = previousEvent;
+		}
+		return ret;
 	}
 
 	async findAll(page: number, params: FindEventDto) {

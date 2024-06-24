@@ -89,6 +89,15 @@ export class EventController {
 		return await this.eventService.findParticipate(page, new FindEventDto(), user.id);
 	}
 
+	@Get(':id/previous-events')
+	async findPreviousEvents(@Param('id', ParseIntPipe) id: number) {
+		const result = await this.eventService.getPreviousEvents(id);
+		if(result === false){
+			throw new NotFoundException('Event not found');
+		}
+		return result;
+	}
+
 	@Get(':id')
 	async findOne(@Param('id', ParseIntPipe) id: number) {
 		const event = await this.eventService.getFullEvent(+id);
