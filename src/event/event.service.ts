@@ -80,7 +80,7 @@ export class EventService {
 	async getFullEvent(eventId: number): Promise<Event>{
 		const event = <any>await this.eventRepository.findOne({
 			where:{id: eventId}, 
-			relations: {volunteer: true, activities: true},
+			relations: {volunteer: true, activities: true, previousEvent: true},
 		});
 		if(!event){
 			return null;
@@ -91,6 +91,10 @@ export class EventService {
 		return event;
 	}
  
+	async getPreviousEvents(){
+
+	}
+
 	async findAll(page: number, params: FindEventDto) {
 		let querry = this.eventRepository.createQueryBuilder("event")
 		.innerJoin("event.activities", "activity_category")
