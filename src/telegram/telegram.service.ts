@@ -43,7 +43,7 @@ export class TelegramService {
 			}else{
 				toRemove = oldConnections;
 			}
-			this.connectionRepository.remove(oldConnections);
+			this.connectionRepository.remove(toRemove);
 		}
 		if(!connection){
 			connection = new TelegramConnection();
