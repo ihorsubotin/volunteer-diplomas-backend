@@ -9,9 +9,9 @@ import { IsVolunteer } from './guards/volunteer.guard';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UserModule, ConfigModule],
-  providers: [AuthService, IsAdmin, IsLoggedIn, IsTelegram, IsVolunteer],
-  controllers: [AuthController],
-  exports: [IsAdmin, IsLoggedIn, IsTelegram, IsVolunteer]
+	imports: [UserModule, ConfigModule],
+	providers: [AuthService, IsAdmin, IsLoggedIn, IsTelegram, IsVolunteer],
+	controllers: [AuthController],
+	exports: [IsAdmin, IsLoggedIn, IsTelegram, IsVolunteer],
 })
 export class AuthModule {}

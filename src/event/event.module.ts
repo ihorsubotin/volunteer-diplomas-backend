@@ -7,10 +7,18 @@ import { ActivityCategoryModule } from '../activity-category/activity-category.m
 import { UpdateModule } from 'src/update/update.module';
 import { TelegramModule } from 'src/telegram/telegram.module';
 import { ConfigModule } from '@nestjs/config';
+import { EventByIdPipe } from './pipe/event-by-id.pipe';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Event]), ActivityCategoryModule, UpdateModule, TelegramModule, ConfigModule],
+	imports: [
+		TypeOrmModule.forFeature([Event]),
+		ActivityCategoryModule,
+		UpdateModule,
+		TelegramModule,
+		ConfigModule,
+	],
 	controllers: [EventController],
-	providers: [EventService],
+	providers: [EventService, EventByIdPipe],
+	exports: [EventService, EventByIdPipe],
 })
-export class EventModule { }
+export class EventModule {}

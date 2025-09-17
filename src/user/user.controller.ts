@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, ForbiddenException, Get, NotFoundException, Param, Patch, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Delete,
+	ForbiddenException,
+	Get,
+	NotFoundException,
+	Param,
+	Patch,
+	Post,
+	Req,
+	UnauthorizedException,
+	UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import CreateUserDTO from './dto/change-user.dto';
 import { IsLoggedIn } from '../auth/guards/loggedIn.guard';
@@ -6,55 +19,54 @@ import { IsAdmin } from '../auth/guards/admin.guard';
 import UpdateUserDTO from './dto/update-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 
-
-
 @Controller('user')
 export class UserController {
-
-	constructor(
-		private userService: UserService
-	){}
+	constructor(private userService: UserService) {}
 
 	@Get()
-	getAll(){
+	getAll() {
 		return this.userService.findAll();
 	}
 
 	@UseGuards(IsLoggedIn)
 	@Get(':id')
-	async getUser(@Req() req, @Param('id') id: string){
-		if(id == 'me'){
+	async getUser(@Req() req, @Param('id') id: string) {
+		if (id == 'me') {
 			id = req.user.id;
 		}
-		if(req.user.isAdmin || (id && req.user.id == id)){
-			const user =  await this.userService.getExtendedUserById(+id);
-			if(user){
+		if (req.user.isAdmin || (id && req.user.id == id)) {
+			const user = await this.userService.getExtendedUserById(+id);
+			if (user) {
 				return user;
-			}else{
+			} else {
 				throw new NotFoundException();
 			}
 		}
-		throw new UnauthorizedException();		
+		throw new UnauthorizedException();
 	}
 
 	@UseGuards(IsAdmin)
 	@Post()
-	createUser(@Body() userDTO: CreateUserDTO){
+	createUser(@Body() userDTO: CreateUserDTO) {
 		return this.userService.createUser(userDTO);
 	}
 
 	@UseGuards(IsLoggedIn)
 	@Patch('password/:id')
-	async changePassword(@Param('id') id: string, @Body() body: ChangePasswordDto, @Req() req){
-		if(id == 'me'){
+	async changePassword(
+		@Param('id') id: string,
+		@Body() body: ChangePasswordDto,
+		@Req() req,
+	) {
+		if (id == 'me') {
 			id = req.user.id;
 		}
-		if(req.user.isAdmin || (id && req.user.id == id)){
-			if(body?.password){
+		if (req.user.isAdmin || (id && req.user.id == id)) {
+			if (body?.password) {
 				const success = this.userService.updatePassword(+id, body.password);
-				if(success){
+				if (success) {
 					return 'Password changed!';
-				}else{
+				} else {
 					throw new NotFoundException();
 				}
 			}
@@ -64,16 +76,20 @@ export class UserController {
 
 	@UseGuards(IsLoggedIn)
 	@Patch(':id')
-	async updateUser(@Param('id') id: string, @Body() userDTO: UpdateUserDTO, @Req() req){
-		if(id == 'me'){
+	async updateUser(
+		@Param('id') id: string,
+		@Body() userDTO: UpdateUserDTO,
+		@Req() req,
+	) {
+		if (id == 'me') {
 			id = req.user.id;
 		}
-		if(!+id){
+		if (!+id) {
 			throw new NotFoundException();
 		}
-		if(req.user.isAdmin || (id && req.user.id == id)){
+		if (req.user.isAdmin || (id && req.user.id == id)) {
 			const user = await this.userService.updateUser(+id, userDTO);
-			if(!user){
+			if (!user) {
 				throw new NotFoundException();
 			}
 			return user;
@@ -83,18 +99,18 @@ export class UserController {
 
 	@UseGuards(IsAdmin)
 	@Delete(':id')
-	async deleteUser(@Param('id') id: string,  @Req() req){
-		if(id == 'me'){
+	async deleteUser(@Param('id') id: string, @Req() req) {
+		if (id == 'me') {
 			id = req.user.id;
 		}
-		if(id && req.user.id == id){
+		if (id && req.user.id == id) {
 			throw new ForbiddenException("You can't delete yourself");
 		}
 
 		const success = await this.userService.deleteUser(+id);
-		if(success){
+		if (success) {
 			return 'Deleted succesfully!';
-		}else{
+		} else {
 			throw new NotFoundException();
 		}
 	}

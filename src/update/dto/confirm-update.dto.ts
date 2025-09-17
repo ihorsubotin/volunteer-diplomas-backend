@@ -1,7 +1,7 @@
-import { IsArray, IsNumber } from "class-validator";
+import { IsArray, IsNumber } from 'class-validator';
 
-export class ConfirmUpdateDTO{
+export class ConfirmUpdateDTO {
 	@IsArray()
-	@IsNumber({},{each: true})
+	@IsNumber({}, { each: true })
 	confirmed: number[];
 }

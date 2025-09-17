@@ -1,12 +1,12 @@
-import { IsArray, IsNotEmpty, IsNumber } from "class-validator";
+import { IsArray, IsNotEmpty, IsNumber } from 'class-validator';
 
-export class CreateAccountDto{
+export class CreateAccountDto {
 	@IsNotEmpty()
 	name: string;
 	@IsNotEmpty()
 	region: string;
 	@IsArray()
-	@IsNumber({},{each: true})
+	@IsNumber({}, { each: true })
 	activities: number[];
 	@IsNotEmpty()
 	userInfo: string;

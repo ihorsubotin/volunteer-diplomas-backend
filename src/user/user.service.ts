@@ -17,43 +17,43 @@ export class UserService {
 		@InjectRepository(TelegramConnection)
 		private connectionRepository: Repository<TelegramConnection>,
 		private config: ConfigService,
-	){}
+	) {}
 
-	async findAll(): Promise<User[]>{
+	async findAll(): Promise<User[]> {
 		return this.userRepository.find();
 	}
 
-	async createUser(user: CreateUserDTO): Promise<User>{
+	async createUser(user: CreateUserDTO): Promise<User> {
 		let userObj;
-		if(user.token){
+		if (user.token) {
 			const connection = await this.connectionRepository.findOne({
-				where: {connectToken: user.token},
-				relations: {user: true}
-			})
-			if(!connection){
+				where: { connectToken: user.token },
+				relations: { user: true },
+			});
+			if (!connection) {
 				return null;
 			}
-			if(connection.validUntil < new Date()){
+			if (connection.validUntil < new Date()) {
 				return null;
 			}
 			connection.validUntil = null;
 			this.connectionRepository.save(connection);
 			userObj = connection.user;
 			userObj.isPartial = false;
-		}else{
+		} else {
 			userObj = new User();
 		}
 		this.userRepository.merge(userObj, user);
-		userObj.passwordHash = "";
+		userObj.passwordHash = '';
 		await this.userRepository.save(userObj);
-		let saltedPassword = userObj.id + user.password;
-		let saltRounds = Number(this.config.get('SALT_ROUNDS'));
+		const saltedPassword = userObj.id + user.password;
+		const saltRounds = Number(this.config.get('SALT_ROUNDS'));
 		userObj.passwordHash = await bcrypt.hash(saltedPassword, saltRounds);
-		await this.userRepository.save(userObj);  
+		await this.userRepository.save(userObj);
 		return userObj;
 	}
 
-	async createPartialUser(user: CreateAccountDto){
+	async createPartialUser(user: CreateAccountDto) {
 		const userObj = new User();
 		userObj.firstName = user.name;
 		userObj.region = user.region;
@@ -62,30 +62,34 @@ export class UserService {
 		return userObj;
 	}
 
-	async findOneByEmail(email: string): Promise<User | null>{
-		if(!email){
+	async findOneByEmail(email: string): Promise<User | null> {
+		if (!email) {
 			return null;
 		}
-		return this.userRepository.findOne({where: {
-			email: email
-		}});
+		return this.userRepository.findOne({
+			where: {
+				email: email,
+			},
+		});
 	}
-	async findOneById(id: number): Promise<User | null>{
-		if(!id){
+	async findOneById(id: number): Promise<User | null> {
+		if (!id) {
 			return null;
 		}
-		return this.userRepository.findOne({where: {
-			id: id
-		}});
+		return this.userRepository.findOne({
+			where: {
+				id: id,
+			},
+		});
 	}
 
-	async getExtendedUserById(id: number){
-		if(!id){
+	async getExtendedUserById(id: number) {
+		if (!id) {
 			return null;
 		}
-		let {passwordHash, ...user} = await this.userRepository.findOne({
+		const { passwordHash, ...user } = await this.userRepository.findOne({
 			where: {
-				id: id
+				id: id,
 			},
 			relations: {
 				volunteer: {
@@ -93,17 +97,19 @@ export class UserService {
 				},
 				contractor: {
 					activities: true,
-				}
-			}
+				},
+			},
 		});
 		return user;
 	}
 
-	async updateUser(id: number, update: UpdateUserDTO){
-		const user = await this.userRepository.findOne({where:{
-			id: id
-		}});
-		if(user){
+	async updateUser(id: number, update: UpdateUserDTO) {
+		const user = await this.userRepository.findOne({
+			where: {
+				id: id,
+			},
+		});
+		if (user) {
 			this.userRepository.merge(user, update);
 			await this.userRepository.save(user);
 			return user;
@@ -111,24 +117,28 @@ export class UserService {
 		return null;
 	}
 
-	async updatePassword(id: number, password: string){
-		const user = await this.userRepository.findOne({where:{
-			id: id
-		}});
-		if(user){
-			let saltedPassword = id + password;
-			let saltRounds = Number(this.config.get('SALT_ROUNDS'));
+	async updatePassword(id: number, password: string) {
+		const user = await this.userRepository.findOne({
+			where: {
+				id: id,
+			},
+		});
+		if (user) {
+			const saltedPassword = id + password;
+			const saltRounds = Number(this.config.get('SALT_ROUNDS'));
 			user.passwordHash = await bcrypt.hash(saltedPassword, saltRounds);
-			await this.userRepository.save(user);  
+			await this.userRepository.save(user);
 			return true;
 		}
 		return false;
 	}
-	async deleteUser(id: number){
-		const user = await this.userRepository.findOne({where:{
-			id: id
-		}});
-		if(user){
+	async deleteUser(id: number) {
+		const user = await this.userRepository.findOne({
+			where: {
+				id: id,
+			},
+		});
+		if (user) {
 			await this.userRepository.remove(user);
 			return true;
 		}

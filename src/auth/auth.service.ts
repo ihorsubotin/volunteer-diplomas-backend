@@ -5,18 +5,18 @@ import { User } from '../entities/user.entity';
 
 @Injectable()
 export class AuthService {
-	constructor(private userService: UserService){}
+	constructor(private userService: UserService) {}
 
-	async validateUser(email: string, password: string){
-		const user : User = await this.userService.findOneByEmail(email);
-		if(!user){
+	async validateUser(email: string, password: string) {
+		const user: User = await this.userService.findOneByEmail(email);
+		if (!user) {
 			return null;
 		}
-		let saltedPassword = user.id + password;
+		const saltedPassword = user.id + password;
 		const match = await bcrypt.compare(saltedPassword, user.passwordHash);
-		if(match){
+		if (match) {
 			return await this.userService.getExtendedUserById(user.id);
-		}else{
+		} else {
 			return null;
 		}
 	}

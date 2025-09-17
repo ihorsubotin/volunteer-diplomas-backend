@@ -1,6 +1,6 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export default class UpdateUserDTO{
+export default class UpdateUserDTO {
 	@IsOptional()
 	@IsNotEmpty()
 	firstName: string;
@@ -12,5 +12,5 @@ export default class UpdateUserDTO{
 	email: string;
 	@IsOptional()
 	@IsString()
-	region:string;
+	region: string;
 }

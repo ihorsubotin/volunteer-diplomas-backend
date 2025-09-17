@@ -1,6 +1,13 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "./user.entity";
-import { ActivityCategory } from "./activity-category.entity";
+import {
+	Column,
+	Entity,
+	JoinTable,
+	ManyToMany,
+	OneToOne,
+	PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from './user.entity';
+import { ActivityCategory } from './activity-category.entity';
 
 @Entity()
 export class Volunteer {
@@ -10,16 +17,16 @@ export class Volunteer {
 	@Column()
 	organizationName: string;
 
-	@Column({default: false})
+	@Column({ default: false })
 	validated: boolean;
 
 	@Column()
 	isSolo: boolean;
 
-	@OneToOne(type=>User, (user)=> user.volunteer, {nullable: false})
+	@OneToOne((type) => User, (user) => user.volunteer, { nullable: false })
 	user: User;
 
-	@ManyToMany(type=>ActivityCategory)
+	@ManyToMany((type) => ActivityCategory)
 	@JoinTable()
 	activities: ActivityCategory[];
 }

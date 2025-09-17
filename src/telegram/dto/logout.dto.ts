@@ -1,6 +1,6 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty } from 'class-validator';
 
-export class TelegramUserDto{
+export class TelegramUserDto {
 	@IsNotEmpty()
-	telegramUser:string;
+	telegramUser: string;
 }

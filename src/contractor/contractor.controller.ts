@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, BadRequestException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+	Controller,
+	Get,
+	Post,
+	Body,
+	Patch,
+	Param,
+	UseGuards,
+	Req,
+	NotFoundException,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { ContractorService } from './contractor.service';
 import { CreateContractorDto } from './dto/create-contractor.dto';
 import { UpdateContractorDto } from './dto/update-contractor.dto';
@@ -9,18 +20,26 @@ import { UserService } from 'src/user/user.service';
 export class ContractorController {
 	constructor(
 		private readonly contractorService: ContractorService,
-		private userService: UserService
-	) { }
+		private userService: UserService,
+	) {}
 
 	@UseGuards(IsLoggedIn)
 	@Post()
 	async create(@Body() createContractorDto: CreateContractorDto, @Req() req) {
 		let contractor;
 		if (req.user.contractor) {
-			contractor = await this.contractorService.findFullContractor(req.user.contractor.id);
-			contractor = await this.contractorService.update(contractor.id, createContractorDto);
-		}else{
-			contractor = await this.contractorService.create(createContractorDto, req.user);
+			contractor = await this.contractorService.findFullContractor(
+				req.user.contractor.id,
+			);
+			contractor = await this.contractorService.update(
+				contractor.id,
+				createContractorDto,
+			);
+		} else {
+			contractor = await this.contractorService.create(
+				createContractorDto,
+				req.user,
+			);
 		}
 		const updatedUser = await this.userService.getExtendedUserById(req.user.id);
 		req.session.user = updatedUser;
@@ -33,9 +52,9 @@ export class ContractorController {
 		if (req.user && req.user.contractor && id == 'me') {
 			id = req.user.contractor.id;
 		}
-		if ((req.user.isAdmin && !isNaN(+id)) || (req.user?.contractor?.id == id)) {
+		if ((req.user.isAdmin && !isNaN(+id)) || req.user?.contractor?.id == id) {
 			const contractor = await this.contractorService.findFullContractor(+id);
-			if(!contractor){
+			if (!contractor) {
 				throw new NotFoundException();
 			}
 			return contractor;
@@ -45,13 +64,20 @@ export class ContractorController {
 
 	@UseGuards(IsLoggedIn)
 	@Patch(':id')
-	async update(@Param('id') id: string, @Req() req, @Body() updateContractorDto: UpdateContractorDto) {
+	async update(
+		@Param('id') id: string,
+		@Req() req,
+		@Body() updateContractorDto: UpdateContractorDto,
+	) {
 		if (req.user && req.user.contractor && id == 'me') {
 			id = req.user.contractor.id;
 		}
-		if ((req.user.isAdmin && !isNaN(+id)) || (req.user?.contractor?.id == id)) {
-			const contractor = await this.contractorService.update(+id, updateContractorDto);
-			if(!contractor){
+		if ((req.user.isAdmin && !isNaN(+id)) || req.user?.contractor?.id == id) {
+			const contractor = await this.contractorService.update(
+				+id,
+				updateContractorDto,
+			);
+			if (!contractor) {
 				throw new NotFoundException();
 			}
 			return contractor;

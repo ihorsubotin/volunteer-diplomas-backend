@@ -9,9 +9,14 @@ import { UserModule } from '../user/user.module';
 import { ContractorModule } from 'src/contractor/contractor.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TelegramConnection]), ConfigModule, UserModule, ContractorModule],
-  providers: [TelegramService],
-  controllers: [TelegramController],
-  exports: [TelegramService]
+	imports: [
+		TypeOrmModule.forFeature([TelegramConnection]),
+		ConfigModule,
+		UserModule,
+		ContractorModule,
+	],
+	providers: [TelegramService],
+	controllers: [TelegramController],
+	exports: [TelegramService],
 })
 export class TelegramModule {}

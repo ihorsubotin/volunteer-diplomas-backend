@@ -10,6 +10,6 @@ import { TelegramConnection } from 'src/entities/telegram-connection.entity';
 	imports: [TypeOrmModule.forFeature([User, TelegramConnection]), ConfigModule],
 	controllers: [UserController],
 	providers: [UserService],
-	exports: [UserService]
+	exports: [UserService],
 })
 export class UserModule {}

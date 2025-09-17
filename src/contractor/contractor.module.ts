@@ -8,9 +8,13 @@ import { UserService } from 'src/user/user.service';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Contractor]), ActivityCategoryModule, UserModule],
-  controllers: [ContractorController],
-  providers: [ContractorService],
-  exports: [ContractorService]
+	imports: [
+		TypeOrmModule.forFeature([Contractor]),
+		ActivityCategoryModule,
+		UserModule,
+	],
+	controllers: [ContractorController],
+	providers: [ContractorService],
+	exports: [ContractorService],
 })
 export class ContractorModule {}

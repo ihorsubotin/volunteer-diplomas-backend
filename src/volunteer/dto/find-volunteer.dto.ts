@@ -1,4 +1,11 @@
-import { Allow, IsArray, IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+	Allow,
+	IsArray,
+	IsBoolean,
+	IsNumber,
+	IsOptional,
+	IsString,
+} from 'class-validator';
 
 export class FindVolunteerDto {
 	@IsOptional()
@@ -9,6 +16,6 @@ export class FindVolunteerDto {
 	isSolo: boolean;
 	@IsOptional()
 	@IsArray()
-	@IsNumber({},{each: true})
+	@IsNumber({}, { each: true })
 	activities: number[];
 }

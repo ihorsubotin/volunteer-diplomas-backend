@@ -16,10 +16,14 @@ export class EventService {
 		@InjectRepository(Event)
 		private eventRepository: Repository<Event>,
 		private activityCategoryService: ActivityCategoryService,
-		private updateService: UpdateService
-	){}
+		private updateService: UpdateService,
+	) {}
 
-	async create(createEventDto: CreateEventDto, user: User, previousEvent: Event) {
+	async create(
+		createEventDto: CreateEventDto,
+		user: User,
+		previousEvent: Event,
+	) {
 		const event = new Event();
 		event.name = createEventDto.name;
 		event.description = createEventDto.description;
@@ -27,11 +31,13 @@ export class EventService {
 		event.location = createEventDto.location;
 		event.date = createEventDto.date;
 		event.volunteer = user.volunteer;
-		event.activities = this.activityCategoryService.convertActivitiesToArray(createEventDto.activities);
-		if(previousEvent){
+		event.activities = this.activityCategoryService.convertActivitiesToArray(
+			createEventDto.activities,
+		);
+		if (previousEvent) {
 			event.previousEvent = previousEvent;
 			event.participants = previousEvent.participants;
-		}else{
+		} else {
 			event.participants = [user];
 		}
 		await this.eventRepository.save(event);
@@ -39,9 +45,12 @@ export class EventService {
 		return event;
 	}
 
-	async participate(id: number, user){
-		const event = await this.eventRepository.findOne({where:{id}, relations: {participants:true}});
-		if(!event){
+	async participate(id: number, user) {
+		const event = await this.eventRepository.findOne({
+			where: { id },
+			relations: { participants: true },
+		});
+		if (!event) {
 			return false;
 		}
 		event.participants.push(user);
@@ -49,13 +58,16 @@ export class EventService {
 		return true;
 	}
 
-	async leave(id: number, user){
-		const event = await this.eventRepository.findOne({where:{id}, relations: {participants:true}});
-		if(!event){
+	async leave(id: number, user) {
+		const event = await this.eventRepository.findOne({
+			where: { id },
+			relations: { participants: true },
+		});
+		if (!event) {
 			return false;
 		}
-		const newParticipants = event.participants.filter((u)=>u.id != user.id);
-		if(event.participants.length > newParticipants.length){
+		const newParticipants = event.participants.filter((u) => u.id != user.id);
+		if (event.participants.length > newParticipants.length) {
 			event.participants = newParticipants;
 			await this.eventRepository.save(event);
 			return true;
@@ -63,46 +75,71 @@ export class EventService {
 		return false;
 	}
 
-	async getEventWithParticipants(eventId: number){
-		if(!eventId){
+	async getEventById(eventId: string) {
+		if (!eventId || isNaN(+eventId)) {
 			return null;
 		}
 		const event = await this.eventRepository.findOne({
-			where:{id: eventId}, 
-			relations: {volunteer: true, participants: true},
+			where: { id: +eventId },
 		});
-		if(!event){
+		if (!event) {
 			return null;
 		}
 		return event;
 	}
 
-	async getFullEvent(eventId: number): Promise<Event>{
-		const event = <any>await this.eventRepository.findOne({
-			where:{id: eventId}, 
-			relations: {volunteer: true, activities: true, previousEvent: true},
-		});
-		if(!event){
+	async getEventWithParticipants(eventId: number) {
+		if (!eventId) {
 			return null;
 		}
-		event.participantsCount = await this.eventRepository.createQueryBuilder("event")
-		.where("event.id = :id", {id: eventId})
-		.innerJoin('event.participants', 'user').getCount();
+		const event = await this.eventRepository.findOne({
+			where: { id: eventId },
+			relations: { volunteer: true, participants: true },
+		});
+		if (!event) {
+			return null;
+		}
 		return event;
 	}
- 
-	async getPreviousEvents(eventId: number){
-		const thisEvent = await this.eventRepository.findOne({where: {id: eventId}, relations: {previousEvent: true}});
-		if(!thisEvent){
+
+	async getFullEvent(eventId: number): Promise<Event> {
+		const event = <any>await this.eventRepository.findOne({
+			where: { id: eventId },
+			relations: { volunteer: true, activities: true, previousEvent: true },
+		});
+		if (!event) {
+			return null;
+		}
+		event.participantsCount = await this.eventRepository
+			.createQueryBuilder('event')
+			.where('event.id = :id', { id: eventId })
+			.innerJoin('event.participants', 'user')
+			.getCount();
+		return event;
+	}
+
+	async getPreviousEvents(eventId: number) {
+		const thisEvent = await this.eventRepository.findOne({
+			where: { id: eventId },
+			relations: { previousEvent: true },
+		});
+		if (!thisEvent) {
 			return false;
 		}
 		let prev = thisEvent.previousEvent;
 		const ret = [];
-		while(prev){
-			let {previousEvent, ...event} = <any>await this.eventRepository.findOne({where: {id: prev.id}, relations: {previousEvent: true, volunteer: true}});
-			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
-			.where("event.id = :id", {id: event.id})
-			.innerJoin('event.participants', 'user').getCount();
+		while (prev) {
+			const { previousEvent, ...event } = <any>(
+				await this.eventRepository.findOne({
+					where: { id: prev.id },
+					relations: { previousEvent: true, volunteer: true },
+				})
+			);
+			event.participantsCount = await this.eventRepository
+				.createQueryBuilder('event')
+				.where('event.id = :id', { id: event.id })
+				.innerJoin('event.participants', 'user')
+				.getCount();
 			ret.push(event);
 			prev = previousEvent;
 		}
@@ -110,106 +147,143 @@ export class EventService {
 	}
 
 	async findAll(page: number, params: FindEventDto) {
-		let querry = this.eventRepository.createQueryBuilder("event")
-		.innerJoin("event.activities", "activity_category")
-		.skip(page * 10).take(10).orderBy("event.id", "DESC");
-		if(params.search){
+		let querry = this.eventRepository
+			.createQueryBuilder('event')
+			.innerJoin('event.activities', 'activity_category')
+			.skip(page * 10)
+			.take(10)
+			.orderBy('event.id', 'DESC');
+		if (params.search) {
 			const querryString = `%${params.search}%`;
 			querry = querry.andWhere(
-			"event.name LIKE :name OR event.description LIKE :name OR location LIKE :name",
-			{name: querryString});
+				'event.name LIKE :name OR event.description LIKE :name OR location LIKE :name',
+				{ name: querryString },
+			);
 		}
-		if(params.activities?.length > 0){
-			querry = querry.andWhere("activity_category.id IN (:...ids)",{ids: params.activities});
+		if (params.activities?.length > 0) {
+			querry = querry.andWhere('activity_category.id IN (:...ids)', {
+				ids: params.activities,
+			});
 		}
-		if(params.finished !== undefined){
-			if(params.finished){
+		if (params.finished !== undefined) {
+			if (params.finished) {
 				querry = querry.andWhere("event.status = 'Завершено'");
-			}else{
-				querry = querry.andWhere("event.status != 'Завершено'")
+			} else {
+				querry = querry.andWhere("event.status != 'Завершено'");
 			}
 		}
 		const events = <any>await querry.getMany();
-		for (const event of events){
-			const {volunteer} = await this.eventRepository.findOne({where: {id: event.id}, relations: {volunteer: true}});
+		for (const event of events) {
+			const { volunteer } = await this.eventRepository.findOne({
+				where: { id: event.id },
+				relations: { volunteer: true },
+			});
 			event.volunteer = volunteer;
-			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
-			.where("event.id = :id", {id: event.id})
-			.innerJoin('event.participants', 'user').getCount();
+			event.participantsCount = await this.eventRepository
+				.createQueryBuilder('event')
+				.where('event.id = :id', { id: event.id })
+				.innerJoin('event.participants', 'user')
+				.getCount();
 		}
 		return events;
 	}
-	
+
 	async findMy(page: number, params: FindEventDto, volunteerId: number) {
-		let querry = this.eventRepository.createQueryBuilder("event")
-		.innerJoin("event.activities", "activity_category")
-		.innerJoin("event.volunteer", "volunteer")
-		.where('volunteer.id = :id', {id: volunteerId});
-		if(params.finished !== undefined){
-			if(params.finished){
+		let querry = this.eventRepository
+			.createQueryBuilder('event')
+			.innerJoin('event.activities', 'activity_category')
+			.innerJoin('event.volunteer', 'volunteer')
+			.where('volunteer.id = :id', { id: volunteerId });
+		if (params.finished !== undefined) {
+			if (params.finished) {
 				querry = querry.andWhere("event.status = 'Завершено'");
-			}else{
-				querry = querry.andWhere("event.status != 'Завершено'")
+			} else {
+				querry = querry.andWhere("event.status != 'Завершено'");
 			}
 		}
-		if(params.search){
+		if (params.search) {
 			const querryString = `%${params.search}%`;
 			querry = querry.andWhere(
-			"event.name LIKE :name OR event.description LIKE :name OR location LIKE :name",
-			{name: querryString});
+				'event.name LIKE :name OR event.description LIKE :name OR location LIKE :name',
+				{ name: querryString },
+			);
 		}
-		if(params.activities?.length > 0){
-			querry = querry.andWhere("activity_category.id IN (:...ids)",{ids: params.activities});
+		if (params.activities?.length > 0) {
+			querry = querry.andWhere('activity_category.id IN (:...ids)', {
+				ids: params.activities,
+			});
 		}
-		const events = <any>await querry.skip(page * 10).take(10).orderBy("event.id", "DESC").getMany();
-		for (const event of events){
-			const {volunteer} = await this.eventRepository.findOne({where: {id: event.id}, relations: {volunteer: true}});
+		const events = <any>await querry
+			.skip(page * 10)
+			.take(10)
+			.orderBy('event.id', 'DESC')
+			.getMany();
+		for (const event of events) {
+			const { volunteer } = await this.eventRepository.findOne({
+				where: { id: event.id },
+				relations: { volunteer: true },
+			});
 			event.volunteer = volunteer;
-			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
-			.where("event.id = :id", {id: event.id})
-			.innerJoin('event.participants', 'user').getCount();
+			event.participantsCount = await this.eventRepository
+				.createQueryBuilder('event')
+				.where('event.id = :id', { id: event.id })
+				.innerJoin('event.participants', 'user')
+				.getCount();
 		}
 		return events;
 	}
 
 	async findParticipate(page: number, params: FindEventDto, userId: number) {
-		let querry = this.eventRepository.createQueryBuilder("event")
-		.innerJoin("event.activities", "activity_category")
-		.innerJoin("event.participants", "user")
-		.where('user.id = :id', {id: userId});
-		if(params.finished !== undefined){
-			if(params.finished){
+		let querry = this.eventRepository
+			.createQueryBuilder('event')
+			.innerJoin('event.activities', 'activity_category')
+			.innerJoin('event.participants', 'user')
+			.where('user.id = :id', { id: userId });
+		if (params.finished !== undefined) {
+			if (params.finished) {
 				querry = querry.andWhere("event.status = 'Завершено'");
-			}else{
-				querry = querry.andWhere("event.status != 'Завершено'")
+			} else {
+				querry = querry.andWhere("event.status != 'Завершено'");
 			}
 		}
-		if(params.search){
+		if (params.search) {
 			const querryString = `%${params.search}%`;
 			querry = querry.andWhere(
-			"event.name LIKE :name OR event.description LIKE :name OR location LIKE :name",
-			{name: querryString});
+				'event.name LIKE :name OR event.description LIKE :name OR location LIKE :name',
+				{ name: querryString },
+			);
 		}
-		if(params.activities?.length > 0){
-			querry = querry.andWhere("activity_category.id IN (:...ids)",{ids: params.activities});
+		if (params.activities?.length > 0) {
+			querry = querry.andWhere('activity_category.id IN (:...ids)', {
+				ids: params.activities,
+			});
 		}
-		const events = <any>await querry.skip(page * 10).take(10).orderBy("event.id", "DESC").getMany();
-		for (const event of events){
-			const {volunteer} = await this.eventRepository.findOne({where: {id: event.id}, relations: {volunteer: true}});
+		const events = <any>await querry
+			.skip(page * 10)
+			.take(10)
+			.orderBy('event.id', 'DESC')
+			.getMany();
+		for (const event of events) {
+			const { volunteer } = await this.eventRepository.findOne({
+				where: { id: event.id },
+				relations: { volunteer: true },
+			});
 			event.volunteer = volunteer;
-			event.participantsCount = await this.eventRepository.createQueryBuilder("event")
-			.where("event.id = :id", {id: event.id})
-			.innerJoin('event.participants', 'user').getCount();
+			event.participantsCount = await this.eventRepository
+				.createQueryBuilder('event')
+				.where('event.id = :id', { id: event.id })
+				.innerJoin('event.participants', 'user')
+				.getCount();
 		}
 		return events;
 	}
 
 	async update(id: number, updateEventDto: UpdateEventDto) {
-		const event = await this.eventRepository.findOne({where: {id: id}});
-		if(!event){
+		const event = await this.eventRepository.findOne({ where: { id: id } });
+		if (!event) {
 			return null;
 		}
-		const {activities, previousEvent, ...fields} = updateEventDto;
+		const { activities, previousEvent, ...fields } = updateEventDto;
 		this.eventRepository.merge(event, fields);
 		await this.eventRepository.save(event);
 		return event;

@@ -1,4 +1,12 @@
-import { IsArray, IsDate, IsDateString, IsNumber, IsOptional, IsString, Length } from "class-validator";
+import {
+	IsArray,
+	IsDate,
+	IsDateString,
+	IsNumber,
+	IsOptional,
+	IsString,
+	Length,
+} from 'class-validator';
 
 export class CreateEventDto {
 	@Length(3, 255)
@@ -26,6 +34,6 @@ export class CreateEventDto {
 	previousEvent: number;
 
 	@IsArray()
-	@IsNumber({},{each: true})
+	@IsNumber({}, { each: true })
 	activities: number[];
 }

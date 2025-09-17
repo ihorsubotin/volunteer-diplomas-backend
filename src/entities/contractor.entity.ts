@@ -1,16 +1,22 @@
-import { Entity, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { ActivityCategory } from "./activity-category.entity";
-import { User } from "./user.entity";
+import {
+	Entity,
+	JoinTable,
+	ManyToMany,
+	OneToOne,
+	PrimaryGeneratedColumn,
+} from 'typeorm';
+import { ActivityCategory } from './activity-category.entity';
+import { User } from './user.entity';
 
 @Entity()
-export class Contractor{
-    @PrimaryGeneratedColumn()
+export class Contractor {
+	@PrimaryGeneratedColumn()
 	id: number;
 
-    @OneToOne(type=>User,  user=>user.contractor, {nullable: false})
+	@OneToOne((type) => User, (user) => user.contractor, { nullable: false })
 	user: User;
 
-    @ManyToMany(type=>ActivityCategory)
+	@ManyToMany((type) => ActivityCategory)
 	@JoinTable()
 	activities: ActivityCategory[];
 }

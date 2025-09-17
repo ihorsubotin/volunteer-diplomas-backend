@@ -7,10 +7,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ActivityCategoryService {
-
 	constructor(
 		@InjectRepository(ActivityCategory)
-		private activityRepository: Repository<ActivityCategory>
+		private activityRepository: Repository<ActivityCategory>,
 	) {}
 
 	async create(createActivityCategoryDto: CreateActivityCategoryDto) {
@@ -21,29 +20,38 @@ export class ActivityCategoryService {
 
 	findAll() {
 		return this.activityRepository.find({
-			order: {name:'ASC'}
+			order: { name: 'ASC' },
 		});
 	}
 
-	async findActivitiesByArray(activities: number[]){
-		const options: any = activities.map(id=>{id: id});
+	async findActivitiesByArray(activities: number[]) {
+		const options: any = activities.map((id) => {
+			id: id;
+		});
 		return await this.activityRepository.findBy(options);
 	}
-	
-	convertActivitiesToArray(activities: number[]){
-		return activities.map(id=>{
+
+	convertActivitiesToArray(activities: number[]) {
+		return activities.map((id) => {
 			const ac = new ActivityCategory();
 			ac.id = id;
 			return ac;
 		});
 	}
-	
-	async update(id: number, updateActivityCategoryDto: UpdateActivityCategoryDto) {
-		if(!id){return null;}
+
+	async update(
+		id: number,
+		updateActivityCategoryDto: UpdateActivityCategoryDto,
+	) {
+		if (!id) {
+			return null;
+		}
 		const activity = await this.activityRepository.findOne({
-			where: {id:id}
+			where: { id: id },
 		});
-		if(!activity){return null;}
+		if (!activity) {
+			return null;
+		}
 		activity.name = updateActivityCategoryDto.name;
 		this.activityRepository.save(activity);
 		return activity;

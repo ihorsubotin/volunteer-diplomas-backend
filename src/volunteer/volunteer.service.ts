@@ -14,8 +14,8 @@ export class VolunteerService {
 		@InjectRepository(Volunteer)
 		private volunteerRepository: Repository<Volunteer>,
 		private userService: UserService,
-		private activityCategoryService: ActivityCategoryService
-	){}
+		private activityCategoryService: ActivityCategoryService,
+	) {}
 
 	async create(createVolunteerDto: CreateVolunteerDto, userId: number) {
 		const userToAttach = await this.userService.findOneById(userId);
@@ -24,46 +24,59 @@ export class VolunteerService {
 		volunteer.user = userToAttach;
 		volunteer.validated = false;
 		volunteer.isSolo = createVolunteerDto.isSolo;
-		volunteer.activities = this.activityCategoryService.convertActivitiesToArray(createVolunteerDto.activities);
-		const {user, ...result} = await this.volunteerRepository.save(volunteer);
+		volunteer.activities =
+			this.activityCategoryService.convertActivitiesToArray(
+				createVolunteerDto.activities,
+			);
+		const { user, ...result } = await this.volunteerRepository.save(volunteer);
 		return result;
 	}
 
-	async find(page: number, params : FindVolunteerDto) {
-		let querry = this.volunteerRepository.createQueryBuilder("volunteer")
-		.innerJoin("volunteer.activities", "activity_category");
-		if(params.organizationName){
+	async find(page: number, params: FindVolunteerDto) {
+		let querry = this.volunteerRepository
+			.createQueryBuilder('volunteer')
+			.innerJoin('volunteer.activities', 'activity_category');
+		if (params.organizationName) {
 			const querryString = `%${params.organizationName}%`;
-			querry = querry.andWhere("volunteer.organizationName LIKE :name", {name: querryString});
+			querry = querry.andWhere('volunteer.organizationName LIKE :name', {
+				name: querryString,
+			});
 		}
-		if(params.isSolo !== undefined){
-			querry = querry.andWhere("volunteer.isSolo = :isSolo", {isSolo: params.isSolo});
+		if (params.isSolo !== undefined) {
+			querry = querry.andWhere('volunteer.isSolo = :isSolo', {
+				isSolo: params.isSolo,
+			});
 		}
-		if(params.activities?.length > 0){
-			querry = querry.andWhere("activity_category.id IN (:...ids)",{ids: params.activities});
+		if (params.activities?.length > 0) {
+			querry = querry.andWhere('activity_category.id IN (:...ids)', {
+				ids: params.activities,
+			});
 		}
-		const volunteers = await querry.skip(page * 10).take(10).getMany();
+		const volunteers = await querry
+			.skip(page * 10)
+			.take(10)
+			.getMany();
 		return volunteers;
 	}
 
 	async findFullVolunteer(id: number) {
-		if(!id){
+		if (!id) {
 			return null;
 		}
 		const volunteer = await this.volunteerRepository.findOne({
 			where: {
-				id: id
+				id: id,
 			},
 			relations: {
-				activities: true
-			}
+				activities: true,
+			},
 		});
 		return volunteer;
 	}
 
-	async validate(id: number){
+	async validate(id: number) {
 		const volunteer = await this.findFullVolunteer(id);
-		if(volunteer){
+		if (volunteer) {
 			volunteer.validated = !volunteer.validated;
 			await this.volunteerRepository.save(volunteer);
 			return volunteer;
@@ -72,17 +85,20 @@ export class VolunteerService {
 	}
 
 	async update(id: number, updateVolunteerDto: UpdateVolunteerDto) {
-		if(!id){
+		if (!id) {
 			return null;
 		}
-		const volunteer = await this.volunteerRepository.findOne({where:{
-			id: id
-		}});
-		if(volunteer){
-			const {activities, ...update} = updateVolunteerDto;
+		const volunteer = await this.volunteerRepository.findOne({
+			where: {
+				id: id,
+			},
+		});
+		if (volunteer) {
+			const { activities, ...update } = updateVolunteerDto;
 			this.volunteerRepository.merge(volunteer, update);
-			if(activities){
-				volunteer.activities = this.activityCategoryService.convertActivitiesToArray(activities);
+			if (activities) {
+				volunteer.activities =
+					this.activityCategoryService.convertActivitiesToArray(activities);
 			}
 			await this.volunteerRepository.save(volunteer);
 			return this.findFullVolunteer(volunteer.id);
