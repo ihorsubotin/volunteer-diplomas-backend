@@ -20,7 +20,7 @@ import { CommentByIdPipe } from './pipe/comment-by-id.pipe';
 import { Comment } from 'src/entities/comment.entity';
 import { UpdateCommentDTO } from './dto/update-comment.dto';
 
-@Controller('events/:eventId/comment')
+@Controller('event/:eventId/comment')
 export class CommentController {
 	constructor(private commentService: CommentService) {}
 	@Get()

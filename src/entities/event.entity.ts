@@ -47,7 +47,7 @@ export class Event {
 	@JoinTable()
 	participants: User[];
 
-	@OneToOne((type) => Poll, (poll)=> poll.event,{nullable: true, eager: true})
+	@OneToOne((type) => Poll, (poll)=> poll.event, {nullable: true, eager: true, onDelete: 'SET NULL'})
 	@JoinColumn()
 	poll: Poll;
 }

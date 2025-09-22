@@ -9,6 +9,7 @@ import { ActivityCategoryService } from '../activity-category/activity-category.
 import { FindEventDto } from './dto/find-event.dto';
 import { UpdateService } from 'src/update/update.service';
 import { User } from 'src/entities/user.entity';
+import { PollService } from 'src/poll/poll.service';
 
 @Injectable()
 export class EventService {
@@ -105,7 +106,7 @@ export class EventService {
 	async getFullEvent(eventId: number): Promise<Event> {
 		const event = <any>await this.eventRepository.findOne({
 			where: { id: eventId },
-			relations: { volunteer: true, activities: true, previousEvent: true },
+			relations: { volunteer: true, activities: true, previousEvent: true, poll: true},
 		});
 		if (!event) {
 			return null;
