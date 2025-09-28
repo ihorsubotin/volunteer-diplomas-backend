@@ -25,4 +25,8 @@ export class FindEventDto {
 	@IsOptional()
 	@IsBoolean()
 	official?: boolean;
+
+	@IsOptional()
+	@IsBoolean()
+	blog?: boolean;
 }

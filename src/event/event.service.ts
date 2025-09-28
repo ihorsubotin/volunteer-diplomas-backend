@@ -176,11 +176,16 @@ export class EventService {
 				querry = querry.andWhere("event.status != 'Завершено'");
 			}
 		}
+		if (params.blog !== undefined) {
+			querry = querry.andWhere("event.isBlog = :blog", 
+				{blog: params.blog}
+			);
+		}
 		if (params.official !== undefined) {
 			querry = querry.innerJoin(
 				'event.volunteer', 
 				'volunteer'
-			).where(
+			).andWhere(
 				'volunteer.isOfficial = :official',
 				{official: params.official}
 			);
