@@ -156,15 +156,11 @@ export class EventService {
 	async findAll(page: number, params: FindEventDto) {
 		let querry = this.eventRepository
 			.createQueryBuilder('event')
-			.innerJoin('event.activities', 'activity_category')
-			.innerJoin('event.volunteer', 'volunteer')
-			.skip(page * 10)
-			.take(10)
-			.orderBy('event.id', 'DESC');
+			.innerJoin('event.activities', 'activity_category');
 		if (params.search) {
 			const querryString = `%${params.search}%`;
 			querry = querry.andWhere(
-				'event.name LIKE :name OR event.description LIKE :name OR location LIKE :name',
+				'(event.name LIKE :name OR event.description LIKE :name OR location LIKE :name)',
 				{ name: querryString },
 			);
 		}
@@ -181,11 +177,18 @@ export class EventService {
 			}
 		}
 		if (params.official !== undefined) {
-			querry = querry.andWhere('volunteer.isOfficial = :official', {
-				official: params.official,
-			});
+			querry = querry.leftJoinAndSelect(
+				'event.volunteer', 
+				'volunteer',
+				'volunteer.isOfficial = :official',
+				{official: params.official}
+			);
 		}
+		querry = querry.skip(page * 10)
+			.take(10)
+			.orderBy('event.id', 'DESC');
 		const events = <any>await querry.getMany();
+		console.log(querry.getQueryAndParameters());
 		for (const event of events) {
 			const { volunteer } = await this.eventRepository.findOne({
 				where: { id: event.id },
@@ -221,7 +224,7 @@ export class EventService {
 		if (params.search) {
 			const querryString = `%${params.search}%`;
 			querry = querry.andWhere(
-				'event.name LIKE :name OR event.description LIKE :name OR location LIKE :name',
+				'(event.name LIKE :name OR event.description LIKE :name OR location LIKE :name)',
 				{ name: querryString },
 			);
 		}
@@ -266,7 +269,7 @@ export class EventService {
 		if (params.search) {
 			const querryString = `%${params.search}%`;
 			querry = querry.andWhere(
-				'event.name LIKE :name OR event.description LIKE :name OR location LIKE :name',
+				'(event.name LIKE :name OR event.description LIKE :name OR location LIKE :name)',
 				{ name: querryString },
 			);
 		}
