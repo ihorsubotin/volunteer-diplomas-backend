@@ -29,6 +29,7 @@ export class EventService {
 		event.name = createEventDto.name;
 		event.description = createEventDto.description;
 		event.status = createEventDto.status;
+		event.isBlog = createEventDto.isBlog;
 		event.location = createEventDto.location;
 		event.date = createEventDto.date;
 		event.volunteer = user.volunteer;

@@ -41,6 +41,7 @@ export class EventController {
 		if (!previousEvent || previousEvent.volunteer.id != req.user.volunteer.id) {
 			previousEvent = null;
 		}
+		createEventDto.isBlog = false;
 		return this.eventService.create(createEventDto, req.user, previousEvent);
 	}
 
@@ -144,6 +145,7 @@ export class EventController {
 		@Param('id', ParseIntPipe) id: number,
 		@Body() updateEventDto: UpdateEventDto,
 	) {
+		updateEventDto.isBlog = false;
 		const event = await this.eventService.update(+id, updateEventDto);
 		if (!event) {
 			throw new NotFoundException();

@@ -2,15 +2,13 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
-	JoinTable,
-	ManyToMany,
 	ManyToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Event } from './event.entity';
-import { CommentReaction, ReactionType } from './comment-reaction.entity';
+import { ReactionType } from './comment-reaction.entity';
 
 @Entity()
 export class Comment {

@@ -21,6 +21,8 @@ export class CreateEventDto {
 	@IsString()
 	status: string;
 
+	isBlog?: boolean;
+
 	@IsOptional()
 	@Length(3, 255)
 	@IsString()

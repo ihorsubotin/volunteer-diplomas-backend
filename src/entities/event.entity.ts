@@ -27,6 +27,9 @@ export class Event {
 	@Column()
 	status: string;
 
+	@Column({ default: false })
+	isBlog: boolean;
+
 	@Column({ nullable: true })
 	location: string;
 
