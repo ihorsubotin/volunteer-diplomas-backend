@@ -5,7 +5,6 @@ import {
 	Body,
 	Patch,
 	Param,
-	Delete,
 	UseGuards,
 	Req,
 	BadRequestException,
@@ -71,6 +70,16 @@ export class VolunteerController {
 	async validate(@Param('id', ParseIntPipe) id: number) {
 		console.log(id);
 		const volunteer = await this.volunteerService.validate(id);
+		if (!volunteer) {
+			throw new NotFoundException('Volunteer not found');
+		}
+		return volunteer;
+	}
+
+	@UseGuards(IsAdmin)
+	@Patch(':id/official')
+	async makeOfficial(@Param('id', ParseIntPipe) id: number) {
+		const volunteer = await this.volunteerService.makeOfficial(id);
 		if (!volunteer) {
 			throw new NotFoundException('Volunteer not found');
 		}

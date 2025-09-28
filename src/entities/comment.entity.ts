@@ -29,7 +29,7 @@ export class Comment {
 	@ManyToOne((type) => Event)
 	event: Event;
 
-	@ManyToOne((type) => Comment, { nullable: true, onDelete: 'CASCADE'})
+	@ManyToOne((type) => Comment, { nullable: true, onDelete: 'CASCADE' })
 	replyTo: Comment;
 
 	@Column({ default: 0 })
@@ -40,9 +40,9 @@ export class Comment {
 
 	reaction: ReactionType;
 
-	@Column({default: false})
+	@Column({ default: false })
 	edited: boolean;
-	
+
 	@UpdateDateColumn()
 	updateTime: Date;
 }

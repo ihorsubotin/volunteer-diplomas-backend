@@ -69,11 +69,11 @@ export class CommentController {
 	async deleteComment(
 		@Param('id', CommentByIdPipe) comment: Comment,
 		@Req() req: any,
-	){
+	) {
 		const user = await this.commentService.getCommentAuthor(comment);
-		if(user.id == req.user.id){
+		if (user.id == req.user.id) {
 			return await this.commentService.deleteComment(comment);
-		}else{
+		} else {
 			throw new UnauthorizedException('You can only remove your comments');
 		}
 	}
@@ -84,11 +84,11 @@ export class CommentController {
 		@Body() updateCommentDto: UpdateCommentDTO,
 		@Param('id', CommentByIdPipe) comment: Comment,
 		@Req() req: any,
-	){
+	) {
 		const user = await this.commentService.getCommentAuthor(comment);
-		if(user.id == req.user.id){
+		if (user.id == req.user.id) {
 			return await this.commentService.editComment(comment, updateCommentDto);
-		}else{
+		} else {
 			throw new UnauthorizedException('You can edit only your comments');
 		}
 	}

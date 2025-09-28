@@ -26,7 +26,7 @@ import { EventService } from 'src/event/event.service';
 export class PollController {
 	constructor(
 		private readonly pollService: PollService,
-		private readonly eventService: EventService
+		private readonly eventService: EventService,
 	) {}
 
 	@UseGuards(IsLoggedIn)
@@ -37,40 +37,43 @@ export class PollController {
 		@Req() req,
 	) {
 		const fullEvent = await this.eventService.getFullEvent(event.id);
-		if(event.poll){
+		if (event.poll) {
 			throw new BadRequestException('Poll already exist');
 		}
-		if(req.user.isAdmin || (req.user.volunteer && req.user.volunteer.id == fullEvent.volunteer.id)){
+		if (
+			req.user.isAdmin ||
+			(req.user.volunteer && req.user.volunteer.id == fullEvent.volunteer.id)
+		) {
 			return this.pollService.create(event, createPollDto);
-		}else{
+		} else {
 			throw new UnauthorizedException("You can't create poll here");
 		}
 	}
 
 	@Get()
-	async findByEvent(
-		@Param('eventId', PollByEventPipe) poll: Poll,
-		@Req() req
-	) {
+	async findByEvent(@Param('eventId', PollByEventPipe) poll: Poll, @Req() req) {
 		return await this.pollService.getUserVote(poll, req?.session?.user);
 	}
 
 	@UseGuards(IsLoggedIn)
 	@Patch()
 	async update(
-		@Param('eventId') eventId: string, 
-		@Param('eventId', PollByEventPipe) poll: Poll, 
+		@Param('eventId') eventId: string,
+		@Param('eventId', PollByEventPipe) poll: Poll,
 		@Body() updatePollDto: UpdatePollDto,
-		@Req() req,	
+		@Req() req,
 	) {
 		const fullEvent = await this.eventService.getFullEvent(+eventId);
-		if(poll.questions.length != updatePollDto.questions.length){
+		if (poll.questions.length != updatePollDto.questions.length) {
 			throw new BadRequestException('Questions size must be equal');
 		}
-		if(req.user.isAdmin || (req.user.volunteer && req.user.volunteer.id == fullEvent.volunteer.id)){
+		if (
+			req.user.isAdmin ||
+			(req.user.volunteer && req.user.volunteer.id == fullEvent.volunteer.id)
+		) {
 			const updatedPoll = await this.pollService.update(poll, updatePollDto);
 			return await this.pollService.getUserVote(poll, req.user);
-		}else{
+		} else {
 			throw new UnauthorizedException("You can't update poll here");
 		}
 	}
@@ -78,14 +81,17 @@ export class PollController {
 	@UseGuards(IsLoggedIn)
 	@Delete()
 	async remove(
-		@Param('eventId') eventId: string, 
+		@Param('eventId') eventId: string,
 		@Param('eventId', PollByEventPipe) poll: Poll,
 		@Req() req,
 	) {
 		const fullEvent = await this.eventService.getFullEvent(+eventId);
-		if(req.user.isAdmin || (req.user.volunteer && req.user.volunteer.id == fullEvent.volunteer.id)){
+		if (
+			req.user.isAdmin ||
+			(req.user.volunteer && req.user.volunteer.id == fullEvent.volunteer.id)
+		) {
 			return this.pollService.remove(poll);
-		}else{
+		} else {
 			throw new UnauthorizedException("You can't delete this poll");
 		}
 	}
@@ -96,14 +102,14 @@ export class PollController {
 		@Param('vote') vote: string,
 		@Param('eventId', PollByEventPipe) poll: Poll,
 		@Req() req,
-	){
-		if(vote && !isNaN(+vote)){
-			if(+vote >= 0 && +vote < poll.questions.length){
+	) {
+		if (vote && !isNaN(+vote)) {
+			if (+vote >= 0 && +vote < poll.questions.length) {
 				return await this.pollService.vote(poll, req.user, +vote);
-			}else{
+			} else {
 				throw new NotFoundException('Vote number does not exist');
 			}
-		}else{
+		} else {
 			throw new BadRequestException('Vote number is incorrect');
 		}
 	}

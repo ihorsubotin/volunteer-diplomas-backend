@@ -12,10 +12,10 @@ export class Poll {
 	@Column('simple-array')
 	questions: string[];
 
-	@Column({default: false})
+	@Column({ default: false })
 	edited: boolean;
-	
-	@Column("int", { array: true })
+
+	@Column('int', { array: true })
 	responded: number[];
 
 	@OneToOne((type) => Event, (event) => event.poll)

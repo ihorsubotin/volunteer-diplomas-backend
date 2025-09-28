@@ -1,4 +1,11 @@
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsNumber, IsString, Length } from "class-validator";
+import {
+	ArrayMaxSize,
+	ArrayMinSize,
+	IsArray,
+	IsNumber,
+	IsString,
+	Length,
+} from 'class-validator';
 
 export class CreatePollDto {
 	@IsString()
@@ -7,7 +14,7 @@ export class CreatePollDto {
 	@IsArray()
 	@ArrayMinSize(2)
 	@ArrayMaxSize(10)
-	@IsString({each: true})
-	@Length(3, 255, {each: true})
+	@IsString({ each: true })
+	@Length(3, 255, { each: true })
 	questions: string[];
 }

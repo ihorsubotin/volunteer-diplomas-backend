@@ -20,8 +20,11 @@ export class Volunteer {
 	@Column({ default: false })
 	validated: boolean;
 
-	@Column()
+	@Column({ default: false })
 	isSolo: boolean;
+
+	@Column({ default: false })
+	isOfficial: boolean;
 
 	@OneToOne((type) => User, (user) => user.volunteer, { nullable: false })
 	user: User;

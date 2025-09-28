@@ -11,14 +11,18 @@ export class FindEventDto {
 	@IsOptional()
 	@Length(0, 255)
 	@IsString()
-	search: string;
+	search?: string;
 
 	@IsOptional()
 	@IsArray()
 	@IsNumber({}, { each: true })
-	activities: number[];
+	activities?: number[];
 
 	@IsOptional()
 	@IsBoolean()
-	finished: boolean;
+	finished?: boolean;
+
+	@IsOptional()
+	@IsBoolean()
+	official?: boolean;
 }

@@ -12,6 +12,7 @@ import { ActivityCategoryModule } from './activity-category/activity-category.mo
 import { ContractorModule } from './contractor/contractor.module';
 import { CommentModule } from './comment/comment.module';
 import { PollModule } from './poll/poll.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
 	imports: [
@@ -34,6 +35,7 @@ import { PollModule } from './poll/poll.module';
 				return dataSource;
 			},
 		}),
+		ScheduleModule.forRoot(),
 		AuthModule,
 		TelegramModule,
 		UpdateModule,

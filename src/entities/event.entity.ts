@@ -21,7 +21,7 @@ export class Event {
 	@Column()
 	name: string;
 
-	@Column('varchar', { length: 10000 })
+	@Column('varchar', { length: 50000 })
 	description: string;
 
 	@Column()
@@ -39,7 +39,7 @@ export class Event {
 	@ManyToOne((type) => Volunteer)
 	volunteer: Volunteer;
 
-	@ManyToMany((type) => ActivityCategory, {eager: true})
+	@ManyToMany((type) => ActivityCategory, { eager: true })
 	@JoinTable()
 	activities: ActivityCategory[];
 
@@ -47,7 +47,11 @@ export class Event {
 	@JoinTable()
 	participants: User[];
 
-	@OneToOne((type) => Poll, (poll)=> poll.event, {nullable: true, eager: true, onDelete: 'SET NULL'})
+	@OneToOne((type) => Poll, (poll) => poll.event, {
+		nullable: true,
+		eager: true,
+		onDelete: 'SET NULL',
+	})
 	@JoinColumn()
 	poll: Poll;
 }

@@ -10,7 +10,7 @@ export class PollVote {
 	@ManyToOne((type) => User)
 	user: User;
 
-	@ManyToOne((type) => Poll, {onDelete: 'CASCADE'})
+	@ManyToOne((type) => Poll, { onDelete: 'CASCADE' })
 	poll: Poll;
 
 	@Column()

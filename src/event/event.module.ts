@@ -8,6 +8,8 @@ import { UpdateModule } from 'src/update/update.module';
 import { TelegramModule } from 'src/telegram/telegram.module';
 import { ConfigModule } from '@nestjs/config';
 import { EventByIdPipe } from './pipe/event-by-id.pipe';
+import { OfficialEventsService } from './official-events.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
 	imports: [
@@ -16,9 +18,10 @@ import { EventByIdPipe } from './pipe/event-by-id.pipe';
 		UpdateModule,
 		TelegramModule,
 		ConfigModule,
+		HttpModule,
 	],
 	controllers: [EventController],
-	providers: [EventService, EventByIdPipe],
+	providers: [EventService, EventByIdPipe, OfficialEventsService],
 	exports: [EventService, EventByIdPipe],
 })
 export class EventModule {}

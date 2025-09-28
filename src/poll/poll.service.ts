@@ -15,8 +15,8 @@ export class PollService {
 		private pollRepository: Repository<Poll>,
 		@InjectRepository(PollVote)
 		private pollVoteRepository: Repository<PollVote>,
-	){}
-	
+	) {}
+
 	async create(event: Event, createPollDto: CreatePollDto) {
 		const poll = new Poll();
 		poll.title = createPollDto.title;
@@ -28,18 +28,20 @@ export class PollService {
 	}
 
 	async findByEvent(eventId: string) {
-		if(eventId && !isNaN(+eventId)){
-			return await this.pollRepository.findOne({where: {event: {id: +eventId}}});
-		}else{
+		if (eventId && !isNaN(+eventId)) {
+			return await this.pollRepository.findOne({
+				where: { event: { id: +eventId } },
+			});
+		} else {
 			return null;
 		}
 	}
 
 	async update(poll: Poll, updatePollDto: UpdatePollDto) {
-		if(updatePollDto.title){
+		if (updatePollDto.title) {
 			poll.title = updatePollDto.title;
 		}
-		if(updatePollDto.questions){
+		if (updatePollDto.questions) {
 			poll.questions = updatePollDto.questions;
 		}
 		poll.edited = true;
@@ -52,20 +54,20 @@ export class PollService {
 		return poll;
 	}
 
-	async vote(poll : Poll, user: User, vote: number){
-		if(!poll?.id || !user?.id){
+	async vote(poll: Poll, user: User, vote: number) {
+		if (!poll?.id || !user?.id) {
 			return null;
 		}
 		const pollVote = await this.pollVoteRepository.findOne({
-			where: {poll: {id: poll.id}, user: {id: user.id}}
+			where: { poll: { id: poll.id }, user: { id: user.id } },
 		});
-		if(pollVote){
-			if(pollVote.vote == vote){
+		if (pollVote) {
+			if (pollVote.vote == vote) {
 				await this.pollVoteRepository.remove(pollVote);
 				poll.responded[vote] -= 1;
 				await this.pollRepository.save(poll);
 				poll.vote = null;
-			}else{
+			} else {
 				poll.responded[pollVote.vote] -= 1;
 				poll.responded[vote] += 1;
 				await this.pollRepository.save(poll);
@@ -73,7 +75,7 @@ export class PollService {
 				await this.pollVoteRepository.save(pollVote);
 				poll.vote = vote;
 			}
-		}else{
+		} else {
 			const newVote = new PollVote();
 			newVote.poll = poll;
 			newVote.user = user;
@@ -85,17 +87,17 @@ export class PollService {
 		}
 		return poll;
 	}
-	async getUserVote(poll: Poll, user: User){
-		if(user?.id && poll?.id){
+	async getUserVote(poll: Poll, user: User) {
+		if (user?.id && poll?.id) {
 			const pollVote = await this.pollVoteRepository.findOne({
-				where: {poll: {id: poll.id}, user: {id: user.id}}
+				where: { poll: { id: poll.id }, user: { id: user.id } },
 			});
-			if(pollVote){
+			if (pollVote) {
 				poll.vote = pollVote.vote;
-			}else{
+			} else {
 				poll.vote = null;
 			}
-		}else{
+		} else {
 			poll.vote = null;
 		}
 		return poll;

@@ -65,8 +65,11 @@ export class CommentService {
 		return comments;
 	}
 
-	async getCommentAuthor(comment: Comment): Promise<User>{
-		const commentRecord = await this.commentRepository.findOne({where: {id: comment.id}, relations: {user: true}});
+	async getCommentAuthor(comment: Comment): Promise<User> {
+		const commentRecord = await this.commentRepository.findOne({
+			where: { id: comment.id },
+			relations: { user: true },
+		});
 		return commentRecord.user;
 	}
 
@@ -129,12 +132,12 @@ export class CommentService {
 		return await this.commentRepository.save(comment);
 	}
 
-	async editComment(comment: Comment, updateCommentDto: UpdateCommentDTO){
+	async editComment(comment: Comment, updateCommentDto: UpdateCommentDTO) {
 		comment.content = updateCommentDto.content;
 		comment.edited = true;
 		return await this.commentRepository.save(comment);
 	}
-	async deleteComment(comment: Comment){
+	async deleteComment(comment: Comment) {
 		return await this.commentRepository.remove(comment);
 	}
 }

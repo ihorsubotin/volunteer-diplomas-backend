@@ -21,6 +21,9 @@ export class UpdateService {
 
 	async createForEvent(event: Event) {
 		const activities = event.activities.map((a) => a.id);
+		if (activities.length == 0) {
+			return;
+		}
 		const users: User[] = <any>(
 			await this.userRepository
 				.createQueryBuilder('user')

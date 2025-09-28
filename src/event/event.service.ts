@@ -106,7 +106,12 @@ export class EventService {
 	async getFullEvent(eventId: number): Promise<Event> {
 		const event = <any>await this.eventRepository.findOne({
 			where: { id: eventId },
-			relations: { volunteer: true, activities: true, previousEvent: true, poll: true},
+			relations: {
+				volunteer: true,
+				activities: true,
+				previousEvent: true,
+				poll: true,
+			},
 		});
 		if (!event) {
 			return null;
@@ -151,6 +156,7 @@ export class EventService {
 		let querry = this.eventRepository
 			.createQueryBuilder('event')
 			.innerJoin('event.activities', 'activity_category')
+			.innerJoin('event.volunteer', 'volunteer')
 			.skip(page * 10)
 			.take(10)
 			.orderBy('event.id', 'DESC');
@@ -173,6 +179,11 @@ export class EventService {
 				querry = querry.andWhere("event.status != 'Завершено'");
 			}
 		}
+		if (params.official !== undefined) {
+			querry = querry.andWhere('volunteer.isOfficial = :official', {
+				official: params.official,
+			});
+		}
 		const events = <any>await querry.getMany();
 		for (const event of events) {
 			const { volunteer } = await this.eventRepository.findOne({
@@ -189,7 +200,11 @@ export class EventService {
 		return events;
 	}
 
-	async findMy(page: number, params: FindEventDto, volunteerId: number) {
+	async findMy(
+		page: number,
+		params: FindEventDto,
+		volunteerId: number,
+	): Promise<Event[]> {
 		let querry = this.eventRepository
 			.createQueryBuilder('event')
 			.innerJoin('event.activities', 'activity_category')

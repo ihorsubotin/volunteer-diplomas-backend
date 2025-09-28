@@ -84,6 +84,16 @@ export class VolunteerService {
 		return null;
 	}
 
+	async makeOfficial(id: number) {
+		const volunteer = await this.findFullVolunteer(id);
+		if (volunteer) {
+			volunteer.isOfficial = !volunteer.isOfficial;
+			await this.volunteerRepository.save(volunteer);
+			return volunteer;
+		}
+		return null;
+	}
+
 	async update(id: number, updateVolunteerDto: UpdateVolunteerDto) {
 		if (!id) {
 			return null;
