@@ -177,9 +177,10 @@ export class EventService {
 			}
 		}
 		if (params.official !== undefined) {
-			querry = querry.leftJoinAndSelect(
+			querry = querry.innerJoin(
 				'event.volunteer', 
-				'volunteer',
+				'volunteer'
+			).where(
 				'volunteer.isOfficial = :official',
 				{official: params.official}
 			);
@@ -188,7 +189,6 @@ export class EventService {
 			.take(10)
 			.orderBy('event.id', 'DESC');
 		const events = <any>await querry.getMany();
-		console.log(querry.getQueryAndParameters());
 		for (const event of events) {
 			const { volunteer } = await this.eventRepository.findOne({
 				where: { id: event.id },
