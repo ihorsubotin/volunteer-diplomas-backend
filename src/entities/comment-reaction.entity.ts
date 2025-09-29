@@ -12,7 +12,7 @@ export class CommentReaction {
 	@ManyToOne((type) => User)
 	user: User;
 
-	@ManyToOne((type) => Comment)
+	@ManyToOne((type) => Comment, {onDelete: 'CASCADE'})
 	comment: Comment;
 
 	@Column({
