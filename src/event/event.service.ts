@@ -192,7 +192,7 @@ export class EventService {
 		}
 		querry = querry.skip(page * 10)
 			.take(10)
-			.orderBy('event.id', 'DESC');
+			.orderBy('event.date', 'DESC');
 		const events = <any>await querry.getMany();
 		for (const event of events) {
 			const { volunteer } = await this.eventRepository.findOne({
@@ -241,7 +241,7 @@ export class EventService {
 		const events = <any>await querry
 			.skip(page * 10)
 			.take(10)
-			.orderBy('event.id', 'DESC')
+			.orderBy('event.date', 'DESC')
 			.getMany();
 		for (const event of events) {
 			const { volunteer } = await this.eventRepository.findOne({
@@ -286,7 +286,7 @@ export class EventService {
 		const events = <any>await querry
 			.skip(page * 10)
 			.take(10)
-			.orderBy('event.id', 'DESC')
+			.orderBy('event.date', 'DESC')
 			.getMany();
 		for (const event of events) {
 			const { volunteer } = await this.eventRepository.findOne({
