@@ -39,7 +39,7 @@ export class CommentService {
 				likes: true,
 				dislikes: true,
 				edited: true,
-				user: { firstName: true, lastName: true },
+				user: { id: true, firstName: true, lastName: true },
 				replyTo: { id: true },
 			},
 		});
